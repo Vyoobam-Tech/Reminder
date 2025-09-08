@@ -12,12 +12,23 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuList,
+  MenuItem,
 } from "@mui/material";
 import { MdDelete } from "react-icons/md";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
+import i18n from "../i18n";
+import { useTranslation } from "react-i18next";
+
 
 const Employee = () => {
+
+  const {t, i18n} = useTranslation()
+  const [language,setLanguage] = useState("en")
   const [search, setSearch] = useState("");
   const [employees, setEmployees] = useState([]);
   const [newEmployeeDialog, setNewEmployeeDialog] = useState(false);
@@ -33,6 +44,13 @@ const Employee = () => {
     doj: "",
     department: "",
   });
+
+  useEffect(() => {
+  if (newEmployeeDialog) {
+    setLanguage("en");        // dropdown resets
+    i18n.changeLanguage("en"); // form labels reset
+  }
+  }, [newEmployeeDialog]);
 
   useEffect(() => {
     fetchEmployee();
@@ -91,6 +109,11 @@ const Employee = () => {
     }
   };
 
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng)
+    setLanguage(lng)
+  }
+
   // Columns config for DataGrid
   const columns = [
     { field: "id", headerName: "Sr.No", width: 80 },
@@ -144,11 +167,13 @@ const Employee = () => {
           >
             Add Employee
           </Button>
-          <Input
+          <TextField
             type="text"
             name="search"
+            value={search}
             placeholder="Search"
             onChange={(e) => setSearch(e.target.value)}
+            autoComplete="off"
           />
         </Box>
       </Paper>
@@ -169,7 +194,24 @@ const Employee = () => {
         open={newEmployeeDialog}
         onClose={() => setNewEmployeeDialog(false)}
       >
-        <DialogTitle>Add New Employee</DialogTitle>
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h6">{t('addNewEmployee')}</Typography>
+
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>Language</InputLabel>
+              <Select
+                value={language}
+                onChange={(e) => changeLanguage(e.target.value)}
+              >
+                <MenuItem value="en">English</MenuItem>
+                <MenuItem value="ta">தமிழ்</MenuItem>
+                <MenuItem value="hi">हिंदी</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogTitle>
+
         <DialogContent>
           {[
             { label: "Emp Id", name: "empid" },
@@ -184,8 +226,8 @@ const Employee = () => {
           ].map((field) => (
             <TextField
               key={field.name}
-              required={field.name === "name" || field.name === "email"}
-              label={field.label}
+              required={field.name === "empid"||field.name === "name" || field.name === "email" || field.name === "phone"}
+              label={t(field.name)}
               name={field.name}
               type={field.type || "text"}
               fullWidth
@@ -193,14 +235,15 @@ const Employee = () => {
               InputLabelProps={field.type === "date" ? { shrink: true } : {}}
               value={newEmployee[field.name]}
               onChange={handleNewEmployeeChange}
+              autoComplete="off"
             />
           ))}
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setNewEmployeeDialog(false)}>Cancel</Button>
+          <Button onClick={() => setNewEmployeeDialog(false)}>{t("cancel")}</Button>
           <Button onClick={handleAddEmployee} variant="contained">
-            Add
+            {t("add")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,0 +1,18 @@
+{
+    "empid": "Emp Id",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "dob": "Date of Birth",
+    "address": "Address",
+    "bloodgroup": "Blood Group",
+    "doj": "Date of Joining",
+    "department": "Department",
+    "purchaseDate": "Purchase Date",
+    "note": "Note",
+    "preferredDelivery": "Preferred Delivery",
+    "addNewCustomer": "Add New Customer",
+    "addNewEmployee": "Add New Employee",
+    "cancel": "Cancel",
+    "add": "Add"
+}

@@ -1,0 +1,18 @@
+{
+    "empid": "कर्मचारी आईडी",
+    "name": "नाम",
+    "email": "ईमेल",
+    "phone": "फ़ोन",
+    "dob": "जन्म तिथि",
+    "address": "पता",
+    "bloodgroup": "रक्त समूह",
+    "doj": "जॉइनिंग की तिथि",
+    "department": "विभाग",
+    "purchaseDate": "खरीद की तारीख",
+    "note": "नोट",
+    "preferredDelivery": "पसंदीदा डिलीवरी",
+    "addNewCustomer": "नया ग्राहक जोड़ें",
+    "addNewEmployee": "नया कर्मचारी जोड़ें",
+    "cancel": "रद्द करें",
+    "add": "जोड़ें"
+}

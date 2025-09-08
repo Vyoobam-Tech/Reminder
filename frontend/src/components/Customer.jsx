@@ -4,11 +4,6 @@ import {
   Container,
   Typography,
   Button,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
   Paper,
   Input,
   Box,
@@ -32,10 +27,15 @@ import * as XLSX from "xlsx";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { TfiClipboard } from "react-icons/tfi";
 import { DataGrid } from "@mui/x-data-grid";
+import i18n from "../i18n";
+import { useTranslation } from "react-i18next";
+
 
 
 
 export default function Customer() {
+  const {t, i18n} = useTranslation()
+  const [language,setLanguage] = useState('en')
   const [search,setSearch] = useState('')
   const [searchResults,setSearchResults] = useState([])
   const [file, setFile] = useState(null);
@@ -60,6 +60,18 @@ export default function Customer() {
   });
   const fileInputRef = useRef();
   const deliveryOptions = ["email", "sms", "whatsapp"];
+
+  useEffect(() => {
+    if (newCustomerDialog) {
+      setLanguage("en");        // dropdown resets
+      i18n.changeLanguage("en"); // form labels reset
+    }
+  }, [newCustomerDialog]);
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng)
+    setLanguage(lng)
+  }
 
   useEffect(() => {
       const filterResults = customers.filter((customer) => 
@@ -308,7 +320,7 @@ export default function Customer() {
             >
               Add Customer
             </Button>
-            <Input 
+            <TextField 
               type='text'
               name='search'
               placeholder='Search'
@@ -364,34 +376,53 @@ export default function Customer() {
           open={newCustomerDialog}
           onClose={() => setNewCustomerDialog(false)}
         >
-          <DialogTitle>Add New Customer</DialogTitle>
+          <DialogTitle>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography variant="h6">{t("addNewCustomer")}</Typography>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel>Language</InputLabel>
+                    <Select
+                      value={language}
+                      onChange={(e) => changeLanguage(e.target.value)}
+                    >
+                      <MenuItem value="en">English</MenuItem>
+                      <MenuItem value="ta">தமிழ்</MenuItem>
+                      <MenuItem value="hi">हिंदी</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+          </DialogTitle>
+
           <DialogContent>
             <TextField
-              label="Name"
+              label={t("name")}
               name="name"
               fullWidth
+              required
               margin="dense"
               value={newCustomer.name}
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label="Email"
+              label={t("email")}
               name="email"
               fullWidth
+              required
               margin="dense"
               value={newCustomer.email}
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label="Phone"
+              label={t("phone")}
               name="phone"
               fullWidth
+              required
               margin="dense"
               value={newCustomer.phone}
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label="Purchase Date"
+              label={t("purchaseDate")}
               name="purchaseDate"
               type="date"
               fullWidth
@@ -401,7 +432,7 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label="Note"
+              label={t("note")}
               name="note"
               fullWidth
               margin="dense"
@@ -409,32 +440,32 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
             <TextField
-            label="Address"
-            name="address"
-            fullWidth
-            margin="dense"
-            value={newCustomer.address}
-            onChange={handleNewCustomerChange}
+              label={t("address")}
+              name="address"
+              fullWidth
+              margin="dense"
+              value={newCustomer.address}
+              onChange={handleNewCustomerChange}
             />
 
             <TextField
-            label="Date of Birth"
-            name="dob"
-            type="date"
-            fullWidth
-            margin="dense"
-            InputLabelProps={{ shrink: true }}
-            value={newCustomer.dob}
-            onChange={handleNewCustomerChange}
+              label={t("dob")}
+              name="dob"
+              type="date"
+              fullWidth
+              margin="dense"
+              InputLabelProps={{ shrink: true }}
+              value={newCustomer.dob}
+              onChange={handleNewCustomerChange}
             />
 
             <FormControl fullWidth margin="dense">
-              <InputLabel id="preferred-label">Preferred Delivery</InputLabel>
+              <InputLabel id="preferred-label">{t("preferredDelivery")}</InputLabel>
               <Select
                 labelId="preferred-label"
                 multiple
                 name="preferredDelivery"
-                input={<OutlinedInput label="Preferred Delivery" />}
+                input={<OutlinedInput label='preferredDelivery' />}
                 value={newCustomer.preferredDelivery}
                 onChange={handleNewCustomerChange}
                 renderValue={(selected) => selected.join(", ")}
@@ -451,9 +482,9 @@ export default function Customer() {
             </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setNewCustomerDialog(false)}>Cancel</Button>
+            <Button onClick={() => setNewCustomerDialog(false)}>{t("cancel")}</Button>
             <Button variant="contained" onClick={handleAddCustomer}>
-              Add
+              {t("add")}
             </Button>
           </DialogActions>
         </Dialog>
