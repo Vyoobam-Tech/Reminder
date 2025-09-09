@@ -136,7 +136,7 @@ const Employee = () => {
           color="error"
           onClick={() => handleDelete(params.row._id)}
         >
-          <MdDelete />
+          <MdDelete size={25}/>
         </Button>
       ),
     },
@@ -183,9 +183,9 @@ const Employee = () => {
         <DataGrid
           rows={rows}
           columns={columns}
-          disableRowSelectionOnClick
-          checkboxSelection
-          experimentalFeatures={{ columnReordering: true }}
+          // disableRowSelectionOnClick
+          // checkboxSelection
+          // experimentalFeatures={{ columnReordering: true }}
         />
       </div>
 

@@ -56,7 +56,7 @@ const FullOverlayCalendar = ({ open, onClose }) => {
             handleDelete(eventInfo.event.id);
           }}
         >
-          <DeleteIcon fontSize="small" />
+          <DeleteIcon size={30}/>
         </IconButton>
       </Box>
     );

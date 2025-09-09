@@ -110,7 +110,7 @@ export default function Notes() {
               key={note._id}
               secondaryAction={
                 <IconButton onClick={() => deleteNote(note._id)}>
-                  <DeleteIcon />
+                  <DeleteIcon size={25}/>
                 </IconButton>
               }
             >

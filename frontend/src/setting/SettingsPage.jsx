@@ -81,19 +81,19 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
               <TextField
                 label="Email"
                 value={user ? user.email : ""}
-                fullWidth
+                sx={{ width:300 }}
                 disabled
               />
               <TextField
                 label="Phone"
                 value={user ? user.phone : ""}
-                fullWidth
+                sx={{ width:300 }}
                 disabled
               />
               <TextField
                 label="Password"
                 value={user ? "********" : ""}
-                fullWidth
+                sx={{ width:300 }}
                 disabled
               />
             </Stack>

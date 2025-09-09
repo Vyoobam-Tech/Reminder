@@ -136,8 +136,8 @@ export default function Reminder() {
                 <TableCell>{r.recurrence}</TableCell>
                 <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell>
                 <TableCell>
-                  <Button size="large" onClick={() => handleOpen(r)}><MdEdit/></Button>
-                  <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete /></Button>
+                  <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25}/></Button>
+                  <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25}/></Button>
                 </TableCell>
               </TableRow>
             ))}

@@ -11,8 +11,8 @@ const sendSMS = async (phone, title, notes = '', type = '') => {
 
   if (to === from) return;
 
-  const messageBody = `🔔 Reminder: ${title}\n📌 Type: ${type}` +
-                      (notes ? `\n📝 Notes: ${notes}` : '');
+  const messageBody = `Reminder: ${title}\n Type: ${type}` +
+                      (notes ? `\n Notes: ${notes}` : '');
 
   try {
     const message = await client.messages.create({ body: messageBody, from, to });

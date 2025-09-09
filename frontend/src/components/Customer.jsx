@@ -267,15 +267,18 @@ export default function Customer() {
     {
       field:"actions",
       headerName:"Actions",
-      width:100,
+      width:150,
       renderCell:(params) => (
         <>
+          <Button size="small" onClick={() => handleEditOpen(params.row)}>
+            <MdEdit size={25}/>
+          </Button>
           <Button
             size="small"
             color="error"
             onClick={() => handleDelete(params.row._id)}
           >
-            <MdDelete />
+            <MdDelete size={25}/>
           </Button>
         </>
       )
@@ -333,8 +336,8 @@ export default function Customer() {
           <DataGrid style={{ height: 500, width: "100%"}}
             columns={columns}
             rows={rows}
-            disableRowSelectionOnClick
-            checkboxSelection
+            // disableRowSelectionOnClick
+            // checkboxSelection
           />
         </div>
 

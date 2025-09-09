@@ -46,7 +46,7 @@ const Topbar = ({ onMenuClick }) => {
               fontSize: { xs: 18, sm: 22 },
             }}
           >
-             Vyoobam Reminder
+            Vyoobam Reminder
           </Typography>
         </Box>
 

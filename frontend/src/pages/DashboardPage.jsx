@@ -21,6 +21,7 @@ import axios from 'axios';
 import MiniCalendar from '../Calendar/MiniCalendar';
 import FullOverlayCalendar from '../Calendar/FullOverlayCalendar';
 import { SlChart,  SlBell } from "react-icons/sl";
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
   const [stats, setStats] = useState({
@@ -29,6 +30,8 @@ const DashboardPage = () => {
     overdueCount: 0,
     customerCount: 0,
   });
+
+  const navigate = useNavigate()
 
   const [recentReminders, setRecentReminders] = useState([]);
   const [recentCustomerReminders, setRecentCustomerReminders] = useState([]);
@@ -100,30 +103,35 @@ const DashboardPage = () => {
       icon: <EventAvailable />,
       value: stats.tasksToday,
       color: '#1976d2',
+      path: "/task"
     },
     {
       label: 'Upcoming Reminders',
       icon: <AlarmOn />,
       value: stats.remindersUpcoming,
       color: '#2e7d32',
+      path: "/reminder"
     },
     {
       label: 'Overdue Reminders',
       icon: <Assessment />,
       value: stats.overdueCount,
       color: '#d32f2f',
+      path: "/reminder"
     },
     {
       label: 'Total Customers',
       icon: <Group />,
       value: stats.customerCount,
       color: '#9c27b0',
+      path: "/customer"
     },
     {
       label: 'Total Employees',
       icon: <Person />,
       value: stats.employeeCount,
-      color: "#4caf50"
+      color: "#4caf50",
+      path: "/employee",
     },
   ];
 
@@ -141,7 +149,7 @@ const DashboardPage = () => {
       <Grid container spacing={3}>
         {statCards.map((card, idx) => (
           <Grid item xs={12} sm={6} md={3} key={idx}>
-            <Paper elevation={4} sx={{ p: 3, display: 'flex', alignItems: 'center', borderRadius: 3 }}>
+            <Paper elevation={4} sx={{ p: 3, display: 'flex', alignItems: 'center', borderRadius: 3, cursor: "pointer", }} onClick={() => navigate(card.path)}>
               <Avatar sx={{ bgcolor: card.color, mr: 2 }}>{card.icon}</Avatar>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -159,7 +167,7 @@ const DashboardPage = () => {
       {/* Recent Reminders */}
       <Box mt={5}>
         <Typography variant="h6" gutterBottom>
-          <SlBell /> Recent General Reminders
+          Recent General Reminders
         </Typography>
         <Paper elevation={3} sx={{ p: 2 }}>
           <List>
@@ -181,7 +189,7 @@ const DashboardPage = () => {
       {/* Recent Customer Reminders */}
       <Box mt={5}>
         <Typography variant="h6" gutterBottom>
-          <SlBell /> Recent Customer Reminders
+          Recent Customer Reminders
         </Typography>
         <Paper elevation={3} sx={{ p: 2 }}>
           <List>
