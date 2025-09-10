@@ -1,26 +1,23 @@
-// utils/sendEmail.js
-import nodemailer from 'nodemailer';
-import buildReminderMessage from './messageBuilder.js';
+import sgMail from '@sendgrid/mail';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_FROM,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const sendEmail = async (to, subject, notes) => {
-  const text = buildReminderMessage({ title: subject, notes });
+  try {
+    const msg = {
+      to,
+      from: process.env.SENDGRID_FROM,
+      subject: `Reminder: ${subject}`,
+      text: notes || 'No notes',
+    };
 
-  const info = await transporter.sendMail({
-    from: process.env.EMAIL_FROM,
-    to,
-    subject: `Reminder: ${subject}`,
-    text,
-  });
-
-  console.log(`✅ Email sent to ${to}: ${info.messageId}`);
+    await sgMail.send(msg);
+    console.log(`✅ Email sent to ${to}`);
+  } catch (err) {
+    console.error(`❌ Email failed for ${to}:`, err.message);
+  }
 };
 
 export default sendEmail;

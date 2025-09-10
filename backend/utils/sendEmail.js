@@ -1,27 +1,22 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const sendEmail = async (to, name, note = '') => {
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const sendEmail = async (to, subject, notes) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_FROM,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+    const msg = {
       to,
-      subject: '⏰ Monthly Reminder',
-      text: `Hi ${name},\n\nThis is your reminder.\n\n📝 Note: ${note || 'No note'}\n\nThanks.`,
-    });
+      from: process.env.SENDGRID_FROM,
+      subject: `Reminder: ${subject}`,
+      text: notes || 'No notes',
+    };
 
-    console.log(`✅ Email sent to ${to} - ID: ${info.messageId}`);
+    await sgMail.send(msg);
+    console.log(`✅ Email sent to ${to}`);
   } catch (err) {
-    console.error(`❌ Email failed for ${name}:`, err.message);
+    console.error(`❌ Email failed for ${to}:`, err.message);
   }
 };
 

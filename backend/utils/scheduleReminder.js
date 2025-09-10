@@ -23,9 +23,9 @@ const scheduleReminders = (customer) => {
           await sendSMS(phone, name, note);
         }
 
-        // if (preferredDelivery?.includes('whatsapp') && phone) {
-        //   await sendWhatsApp(phone, name, note);
-        // }
+        if (preferredDelivery?.includes('whatsapp') && phone) {
+          await sendWhatsApp(phone, name, note);
+        }
 
         console.log(`✅ Reminder sent to ${name}`);
       } catch (err) {
