@@ -4,9 +4,10 @@ import axios from 'axios';
 import {
   Container, Typography, Button, Table, TableHead, TableBody, TableRow, TableCell,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, Paper, Box,
-  Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel, OutlinedInput, Autocomplete
+  Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel, OutlinedInput, Autocomplete,
+  IconButton, InputAdornment
 } from '@mui/material';
-import { MdDelete, MdEdit } from "react-icons/md";
+import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
 import { SlBell } from "react-icons/sl";
 
 const reminderTypes = [
@@ -23,6 +24,8 @@ export default function Reminder() {
     title: '',
     type: 'Custom',
     notes: '',
+    image: null,
+    video: null,
     date: '',
     recurrence: 'One-time',
     deliveryMethods: [],
@@ -60,7 +63,9 @@ export default function Reminder() {
     if (reminder) {
       setFormData({
         ...reminder,
-        date: reminder.date?.slice(0, 16),
+        image: reminder.image || null,
+        video: reminder.video || null,
+        date: reminder.date?.slice(0, 16) || '',
         deliveryMethods: reminder.deliveryMethods || [],
         email: reminder.email || '',
         phone: reminder.phone || '',
@@ -81,23 +86,51 @@ export default function Reminder() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'deliveryMethods' || name === 'groupemail') {
-      setFormData((prev) => ({ ...prev, [name]: typeof value === 'string' ? value.split(',') : value }));
+      setFormData(prev => ({ ...prev, [name]: Array.isArray(value) ? value : [value] }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = async () => {
     try {
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("type", formData.type);
+      data.append("notes", formData.notes);
+      data.append("date", formData.date);
+      data.append("recurrence", formData.recurrence);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      data.append("whatsapp", formData.whatsapp);
+
+      // Ensure deliveryMethods array is always up-to-date
+      const methods = [...formData.deliveryMethods];
+      if (formData.email && !methods.includes("email")) methods.push("email");
+      if (formData.phone && !methods.includes("phone")) methods.push("phone");
+      if (formData.whatsapp && !methods.includes("whatsapp")) methods.push("whatsapp");
+      if (formData.groupemail.length && !methods.includes("emailgroup")) methods.push("emailgroup");
+
+      methods.forEach(m => data.append("deliveryMethods[]", m));
+      formData.groupemail.forEach(e => data.append("groupemail[]", e));
+
+      if (formData.image) data.append("image", formData.image);
+      if (formData.video) data.append("video", formData.video);
+
       if (editId) {
-        await axios.put(`http://localhost:5000/api/reminders/${editId}`, formData);
+        await axios.put(`http://localhost:5000/api/reminders/${editId}`, data, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
       } else {
-        await axios.post('http://localhost:5000/api/reminders', formData);
+        await axios.post("http://localhost:5000/api/reminders", data, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
       }
+
       fetchReminders();
       setDialogOpen(false);
     } catch (err) {
-      alert('Save failed: ' + err.message);
+      alert("Save failed: " + err.message);
     }
   };
 
@@ -136,8 +169,8 @@ export default function Reminder() {
                 <TableCell>{r.recurrence}</TableCell>
                 <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell>
                 <TableCell>
-                  <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25}/></Button>
-                  <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25}/></Button>
+                  <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25} /></Button>
+                  <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25} /></Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -153,37 +186,85 @@ export default function Reminder() {
           <TextField select fullWidth margin="dense" label="Type" name="type" value={formData.type} onChange={handleChange}>
             {reminderTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
           </TextField>
-          <TextField fullWidth margin="dense" label="Notes" name="notes" value={formData.notes} onChange={handleChange} />
-          <TextField fullWidth margin="dense" type="datetime-local" label="Reminder Date" name="date" InputLabelProps={{ shrink: true }} value={formData.date} onChange={handleChange} />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="Notes"
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton color="primary" component="label">
+                    <MdImage size={22} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={(e) =>
+                        setFormData(prev => ({ ...prev, image: e.target.files[0] || null }))
+                      }
+                    />
+                  </IconButton>
+                  <IconButton color="secondary" component="label">
+                    <MdVideoLibrary size={22} />
+                    <input
+                      type="file"
+                      accept="video/*"
+                      hidden
+                      onChange={(e) =>
+                        setFormData(prev => ({ ...prev, video: e.target.files[0] || null }))
+                      }
+                    />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+
+          <TextField
+            fullWidth
+            margin="dense"
+            type="datetime-local"
+            label="Reminder Date"
+            name="date"
+            InputLabelProps={{ shrink: true }}
+            value={formData.date}
+            onChange={handleChange}
+          />
+
           <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" value={formData.recurrence} onChange={handleChange}>
             {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
           </TextField>
 
+          {/* Delivery Methods */}
           <FormControl fullWidth margin="dense">
-            <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
-            <Select
-              labelId="delivery-methods-label"
-              multiple
-              name="deliveryMethods"
-              value={formData.deliveryMethods}
-              onChange={handleChange}
-              input={<OutlinedInput label="Preferred Choice" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {deliveryOptions.map((method) => (
-                <MenuItem key={method} value={method}>
-                  <Checkbox checked={formData.deliveryMethods.includes(method)} />
-                  <ListItemText primary={method} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+  <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
+  <Select
+    labelId="delivery-methods-label"
+    multiple
+    name="deliveryMethods"
+    value={formData.deliveryMethods}
+    onChange={handleChange}
+    input={<OutlinedInput label="Preferred Choice" />}
+    renderValue={(selected) => selected.join(', ')}
+  >
+    {deliveryOptions.map((method) => (
+      <MenuItem key={method} value={method}>
+        <Checkbox checked={formData.deliveryMethods.includes(method)} />
+        <ListItemText primary={method} />
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
 
           {formData.deliveryMethods.includes('email') && (
             <Autocomplete
               options={customers.map(c => c.email).filter(Boolean)}
               value={formData.email}
-              onChange={(e, value) => setFormData(prev => ({ ...prev, email: value }))}
+              onChange={(e, value) => setFormData(prev => ({ ...prev, email: value || '' }))}
               renderInput={(params) => <TextField {...params} label="Email Address" margin="dense" fullWidth />}
               freeSolo
             />
@@ -192,7 +273,7 @@ export default function Reminder() {
             <Autocomplete
               options={customers.map(c => c.phone).filter(Boolean)}
               value={formData.phone}
-              onChange={(e, value) => setFormData(prev => ({ ...prev, phone: value }))}
+              onChange={(e, value) => setFormData(prev => ({ ...prev, phone: value || '' }))}
               renderInput={(params) => <TextField {...params} label="Phone Number" margin="dense" fullWidth />}
               freeSolo
             />
@@ -221,6 +302,7 @@ export default function Reminder() {
               </Select>
             </FormControl>
           )}
+
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>

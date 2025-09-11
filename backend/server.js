@@ -4,7 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-import fileUpload from 'express-fileupload';
+// import fileUpload from 'express-fileupload';
 import customerRoutes from './routes/customerRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js'
 import reminderRoutes from './routes/reminderRoutes.js';
@@ -13,6 +13,7 @@ import reportRoutes from './routes/reportRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
+import path from 'path'
 
 
 dotenv.config();
@@ -21,7 +22,8 @@ const app = express();
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(fileUpload());
+app.use("/uploads", express.static(path.resolve("uploads")));
+// app.use(fileUpload());
 
 
 connectDB();

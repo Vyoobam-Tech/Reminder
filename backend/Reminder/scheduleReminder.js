@@ -26,7 +26,7 @@ const scheduleReminder = (reminder) => {
 
         // 1. Individual email
         if (deliveryMethods.includes('email') && email) {
-          await sendEmail(email, reminder.title, reminder.notes);
+          await sendEmail(email, reminder.title, reminder.notes,reminder.image);
         }
 
         // 2. SMS

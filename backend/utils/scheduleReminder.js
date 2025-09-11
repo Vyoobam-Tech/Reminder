@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import sendEmail from './sendEmail.js';
 import sendSMS from './sendSMS.js';
-// import sendWhatsApp from './sendWhatsApp.js'; // Optional
+import sendWhatsApp from './sendWhatsApp.js'; // Optional
 
 const scheduleReminders = (customer) => {
   if (!customer.reminderDate) return;
