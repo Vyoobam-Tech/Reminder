@@ -15,6 +15,7 @@ const reminderTypes = [
   'Subscription/Service Renewal', 'Product Delivery', 'Custom'
 ];
 const recurrenceOptions = ['One-time', 'Daily', 'Weekly', 'Monthly'];
+const recipientOptions = ['Individual', 'Group'];
 const deliveryOptions = ['email', 'phone', 'whatsapp', 'emailgroup'];
 
 export default function Reminder() {
@@ -28,6 +29,7 @@ export default function Reminder() {
     video: null,
     date: '',
     recurrence: 'One-time',
+    recipient:'Customer',
     deliveryMethods: [],
     email: '',
     phone: '',
@@ -238,26 +240,30 @@ export default function Reminder() {
             {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
           </TextField>
 
+          <TextField select fullWidth margin='dense' label='Recipient' name='recipient' value={formData.recipient} >
+            {recipientOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+          </TextField>
+
           {/* Delivery Methods */}
           <FormControl fullWidth margin="dense">
-  <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
-  <Select
-    labelId="delivery-methods-label"
-    multiple
-    name="deliveryMethods"
-    value={formData.deliveryMethods}
-    onChange={handleChange}
-    input={<OutlinedInput label="Preferred Choice" />}
-    renderValue={(selected) => selected.join(', ')}
-  >
-    {deliveryOptions.map((method) => (
-      <MenuItem key={method} value={method}>
-        <Checkbox checked={formData.deliveryMethods.includes(method)} />
-        <ListItemText primary={method} />
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+            <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
+            <Select
+              labelId="delivery-methods-label"
+              multiple
+              name="deliveryMethods"
+              value={formData.deliveryMethods}
+              onChange={handleChange}
+              input={<OutlinedInput label="Preferred Choice" />}
+              renderValue={(selected) => selected.join(', ')}
+            >
+              {deliveryOptions.map((method) => (
+                <MenuItem key={method} value={method}>
+                  <Checkbox checked={formData.deliveryMethods.includes(method)} />
+                  <ListItemText primary={method} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
 
           {formData.deliveryMethods.includes('email') && (

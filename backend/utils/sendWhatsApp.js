@@ -1,55 +1,42 @@
 import twilio from 'twilio';
 import dotenv from 'dotenv';
+import cloudinary from './cloudinary.js';
+import path from 'path';
 dotenv.config();
 
 const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
-/**
- * Sends a WhatsApp reminder using Twilio Sandbox.
- * @param {string} phone - Customer phone number (with or without +91 / leading 0)
- * @param {string} name - Customer name
- * @param {string} note - Optional note content
- */
-const sendWhatsApp = async (phone, name, note = '') => {
-  if (!phone) {
-    console.warn(`⚠️ No phone number provided for ${name}`);
-    return;
-  }
+const sendWhatsApp = async (phone, name, note = '', image = null, video = null) => {
+  if (!phone) return console.warn(`⚠️ No phone number for ${name}`);
 
-  // Remove all non-digits
   let cleanPhone = phone.replace(/\D/g, '');
+  if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) cleanPhone = cleanPhone.substring(2);
+  if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
+  if (!/^\d{10}$/.test(cleanPhone)) return console.warn(`⚠️ Invalid phone for ${name}`);
 
-  // If number starts with 91 and length is 12 → strip country code
-  if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
-    cleanPhone = cleanPhone.substring(2);
-  }
-
-  // If number starts with 0 and length is 11 → strip leading 0
-  if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
-    cleanPhone = cleanPhone.substring(1);
-  }
-
-  // Validate length (must be 10 digits for Indian mobile)
-  if (!/^\d{10}$/.test(cleanPhone)) {
-    console.warn(`⚠️ Invalid phone number for ${name}: ${phone}`);
-    return;
-  }
-
-  // Format in WhatsApp E.164
   const to = `whatsapp:+91${cleanPhone}`;
-  const from = process.env.TWILIO_WHATSAPP_NUMBER; // whatsapp:+14155238886 (sandbox)
+  const from = process.env.TWILIO_WHATSAPP_NUMBER;
 
-  // Avoid sending to self
-  if (to === from) {
-    console.warn(`⚠️ Skipping WhatsApp to ${name}: sender and receiver can't be the same`);
-    return;
-  }
+  const mediaUrls = [];
 
   try {
+    if (image && image.url) {
+      const localImagePath = path.join(process.cwd(), image.url);
+      const imgRes = await cloudinary.uploader.upload(localImagePath, { resource_type: 'image' });
+      mediaUrls.push(imgRes.secure_url);
+    }
+
+    if (video && video.url) {
+      const localVideoPath = path.join(process.cwd(), video.url);
+      const vidRes = await cloudinary.uploader.upload(localVideoPath, { resource_type: 'video' });
+      mediaUrls.push(vidRes.secure_url);
+    }
+
     const message = await client.messages.create({
       from,
       to,
       body: `Hi ${name}, this is your WhatsApp reminder.${note ? `\n📝 ${note}` : ''}`,
+      ...(mediaUrls.length ? { mediaUrl: mediaUrls } : {})
     });
 
     console.log(`✅ WhatsApp sent to ${name}: ${message.sid}`);

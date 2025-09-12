@@ -1,7 +1,8 @@
 import cron from 'node-cron';
-import sendEmail from './sendEmail.js';
-import sendSMS from './reminderSMS.js';
+import sendEmail from '../utils/sendEmail.js';
+import sendSMS from '../utils/sendSMS.js'
 import Group from '../models/Group.js';
+import sendWhatsApp from '../utils/sendWhatsApp.js';
 
 const scheduleReminder = (reminder) => {
   const reminderDate = new Date(reminder.date);
@@ -22,11 +23,11 @@ const scheduleReminder = (reminder) => {
       console.log(`📨 Triggering: ${reminder.title}`);
 
       try {
-        const { deliveryMethods = [], email, phone, groupemail = [] } = reminder;
+        const { deliveryMethods = [], email, phone, whatsapp, groupemail = [] } = reminder;
 
         // 1. Individual email
         if (deliveryMethods.includes('email') && email) {
-          await sendEmail(email, reminder.title, reminder.notes,reminder.image);
+          await sendEmail(email, reminder.title, reminder.notes,reminder.image, reminder.video);
         }
 
         // 2. SMS
@@ -34,7 +35,14 @@ const scheduleReminder = (reminder) => {
           await sendSMS(phone, reminder.title, reminder.notes, reminder.type);
         }
 
-        // 3. Group emails (supporting multiple group names)
+        // 3. WhatsApp
+        if (deliveryMethods.includes('whatsapp') && whatsapp) {
+          console.log(`📲 Sending WhatsApp to: ${whatsapp}`);
+          await sendWhatsApp(whatsapp, reminder.title, reminder.notes, reminder.image, reminder.video);
+        }
+
+
+        // 4. Group emails (supporting multiple group names)
         if (deliveryMethods.includes('emailgroup') && Array.isArray(groupemail)) {
           for (const groupName of groupemail) {
             const group = await Group.findOne({ name: groupName }).populate('members');

@@ -1,7 +1,7 @@
 import express from 'express';
 import xlsx from 'xlsx';
 import Customer from '../models/Customer.js';
-import scheduleReminders from '../utils/scheduleReminder.js';
+import scheduleReminder from '../Reminder/scheduleReminder.js';
 
 const router = express.Router();
 
@@ -29,7 +29,7 @@ router.post('/upload', async (req, res) => {
 
     const inserted = await Customer.insertMany(filtered);
 
-    inserted.forEach(c => c.reminderDate && scheduleReminders(c));
+    inserted.forEach(c => c.reminderDate && scheduleReminder(c));
 
     res.json({
       success: true,
@@ -65,7 +65,7 @@ router.post('/', async (req, res) => {
 
     await customer.save();
 
-    if (customer.reminderDate) scheduleReminders(customer);
+    if (customer.reminderDate) scheduleReminder(customer);
 
     res.status(201).json(customer);
   } catch (err) {
@@ -104,7 +104,7 @@ router.put('/:id', async (req, res) => {
 
     if (!updated) return res.status(404).json({ message: 'Customer not found' });
 
-    if (updated.reminderDate) scheduleReminders(updated);
+    if (updated.reminderDate) scheduleReminder(updated);
 
     res.json(updated);
   } catch (err) {
