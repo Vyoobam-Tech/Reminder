@@ -1,8 +1,9 @@
-import cron from 'node-cron';
-import sendEmail from '../utils/sendEmail.js';
-import sendSMS from '../utils/sendSMS.js'
-import Group from '../models/Group.js';
-import sendWhatsApp from '../utils/sendWhatsApp.js';
+import cron from "node-cron";
+import sendEmail from "../utils/sendEmail.js";
+import sendSMS from "../utils/sendSMS.js";
+import sendWhatsApp from "../utils/sendWhatsApp.js";
+import Group from "../models/Group.js";
+import Reminder from "../models/Reminder.js";
 
 const scheduleReminder = (reminder) => {
   const reminderDate = new Date(reminder.date);
@@ -23,52 +24,98 @@ const scheduleReminder = (reminder) => {
       console.log(`📨 Triggering: ${reminder.title}`);
 
       try {
-        const { deliveryMethods = [], email, phone, whatsapp, groupemail = [] } = reminder;
+        // ✅ Reload reminder with both recipients and groups populated
+        const populatedReminder = await Reminder.findById(reminder._id)
+          .populate("recipients") // individual customers
+          .populate({
+            path: "groups",
+            populate: { path: "members" }, // each group's members (customers)
+          });
 
-        // 1. Individual email
-        if (deliveryMethods.includes('email') && email) {
-          await sendEmail(email, reminder.title, reminder.notes,reminder.image, reminder.video);
-        }
+        if (!populatedReminder) return;
 
-        // 2. SMS
-        if (deliveryMethods.includes('phone') && phone) {
-          await sendSMS(phone, reminder.title, reminder.notes, reminder.type);
-        }
-
-        // 3. WhatsApp
-        if (deliveryMethods.includes('whatsapp') && whatsapp) {
-          console.log(`📲 Sending WhatsApp to: ${whatsapp}`);
-          await sendWhatsApp(whatsapp, reminder.title, reminder.notes, reminder.image, reminder.video);
-        }
-
-
-        // 4. Group emails (supporting multiple group names)
-        if (deliveryMethods.includes('emailgroup') && Array.isArray(groupemail)) {
-          for (const groupName of groupemail) {
-            const group = await Group.findOne({ name: groupName }).populate('members');
-            if (!group) {
-              console.warn(`⚠️ No group found for name: ${groupName}`);
-              continue;
-            }
-            if (!group.members || group.members.length === 0) {
-              console.warn(`⚠️ Group "${groupName}" has no members.`);
-              continue;
+        // ----------------------------
+        // 🔹 Send to individual recipients
+        // ----------------------------
+        for (const customer of populatedReminder.recipients) {
+          for (const method of customer.preferredDelivery || []) {
+            if (method === "email" && customer.email) {
+              await sendEmail(
+                customer.email,
+                populatedReminder.title,
+                populatedReminder.notes,
+                populatedReminder.image,
+                populatedReminder.video
+              );
             }
 
-            for (const member of group.members) {
-              if (member.email) {
-                await sendEmail(member.email, reminder.title, reminder.notes);
-              } else {
-                console.warn(`⚠️ No email for group member ${member._id}`);
+            if (method === "phone" && customer.phone) {
+              await sendSMS(
+                customer.phone,
+                populatedReminder.title,
+                populatedReminder.notes,
+                populatedReminder.type
+              );
+            }
+
+            if (method === "whatsapp" && customer.phone) {
+              console.log(`📲 Sending WhatsApp to: ${customer.phone}`);
+              await sendWhatsApp(
+                customer.phone,
+                populatedReminder.title,
+                populatedReminder.notes,
+                populatedReminder.image,
+                populatedReminder.video
+              );
+            }
+          }
+        }
+
+        // ----------------------------
+        // 🔹 Send to group members
+        // ----------------------------
+        for (const group of populatedReminder.groups || []) {
+          if (!group.members?.length) continue;
+
+          for (const member of group.members) {
+            for (const method of member.preferredDelivery || []) {
+              if (method === "email" && member.email) {
+                await sendEmail(
+                  member.email,
+                  populatedReminder.title,
+                  populatedReminder.notes,
+                  populatedReminder.image,
+                  populatedReminder.video
+                );
+              }
+
+              if (method === "phone" && member.phone) {
+                await sendSMS(
+                  member.phone,
+                  populatedReminder.title,
+                  populatedReminder.notes,
+                  populatedReminder.type
+                );
+              }
+
+              if (method === "whatsapp" && member.phone) {
+                console.log(`📲 Sending WhatsApp to (group member): ${member.phone}`);
+                await sendWhatsApp(
+                  member.phone,
+                  populatedReminder.title,
+                  populatedReminder.notes,
+                  populatedReminder.image,
+                  populatedReminder.video
+                );
               }
             }
           }
         }
       } catch (e) {
-        console.error('❌ Reminder failed:', e.message);
+        console.error("❌ Reminder failed:", e.message);
       }
     },
-    { timezone: 'Asia/Kolkata' }
+    { timezone: "Asia/Kolkata" }
   );
 };
 

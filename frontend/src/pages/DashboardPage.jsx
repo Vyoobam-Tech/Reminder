@@ -142,7 +142,7 @@ const DashboardPage = () => {
         <Typography variant="h4" fontWeight={600}>
           <SlChart /> Dashboard Analytics
         </Typography>
-        <MiniCalendar onOpenFull={() => setShowCalendar(true)} />
+        {/* <MiniCalendar onOpenFull={() => setShowCalendar(true)} /> */}
       </Box>
 
       {/* Stat Cards */}

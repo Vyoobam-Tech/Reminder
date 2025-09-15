@@ -1,320 +1,434 @@
-// ✅ FRONTEND - Reminder.jsx
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import {
-  Container, Typography, Button, Table, TableHead, TableBody, TableRow, TableCell,
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Paper, Box,
-  Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel, OutlinedInput, Autocomplete,
-  IconButton, InputAdornment
-} from '@mui/material';
-import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
-import { SlBell } from "react-icons/sl";
+  // ✅ FRONTEND - Reminder.jsx
+  import React, { useEffect, useState } from 'react';
+  import axios from 'axios';
+  import {
+    Container, Typography, Button, Table, TableHead, TableBody, TableRow, TableCell,
+    Dialog, DialogTitle, DialogContent, DialogActions, TextField, Paper, Box,
+    Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel, OutlinedInput, Autocomplete,
+    IconButton, InputAdornment,
+    Grid
+  } from '@mui/material';
+  import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
+  import { SlBell } from "react-icons/sl";
 
-const reminderTypes = [
-  'Meeting', 'Client Follow-up', 'Payment Due',
-  'Subscription/Service Renewal', 'Product Delivery', 'Custom'
-];
-const recurrenceOptions = ['One-time', 'Daily', 'Weekly', 'Monthly'];
-const recipientOptions = ['Individual', 'Group'];
-const deliveryOptions = ['email', 'phone', 'whatsapp', 'emailgroup'];
+  const reminderTypes = [
+    'Meeting', 'Client Follow-up', 'Payment Due',
+    'Subscription/Service Renewal', 'Product Delivery', 'Custom'
+  ];
+  const recurrenceOptions = ['One-time', 'Daily', 'Weekly', 'Monthly'];
+  const recipientOptions = ['Individual', 'Group'];
+  const deliveryOptions = ['email', 'phone', 'whatsapp', 'emailgroup'];
 
-export default function Reminder() {
-  const [reminders, setReminders] = useState([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    type: 'Custom',
-    notes: '',
-    image: null,
-    video: null,
-    date: '',
-    recurrence: 'One-time',
-    recipient:'Customer',
-    deliveryMethods: [],
-    email: '',
-    phone: '',
-    whatsapp: '',
-    groupemail: []
-  });
-  const [editId, setEditId] = useState(null);
-  const [emailGroups, setEmailGroups] = useState([]);
-  const [customers, setCustomers] = useState([]);
+  export default function Reminder() {
+    const [reminders, setReminders] = useState([]);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [formData, setFormData] = useState({
+      title: '',
+      type: 'Custom',
+      notes: '',
+      image: null,
+      video: null,
+      date: '',
+      recurrence: 'One-time',
+      recipient:'Customer',
+      deliveryMethods: [],
+      email: '',
+      phone: '',
+      whatsapp: '',
+      groupemail: []
+    });
+    const [editId, setEditId] = useState(null);
+    const [emailGroups, setEmailGroups] = useState([]);
+    const [customers, setCustomers] = useState([]);
 
-  useEffect(() => {
-    fetchReminders();
-    fetchEmailGroups();
-    fetchCustomers();
-  }, []);
+    const [recipientType, setRecipientType] = useState('')
+    const [customerOptions, setCustomerOptions] = useState([])
+    const [groupOptions, setGroupOptions] = useState([])
+    const [selectedRecipients, setSelectedRecipients] = useState([])
 
-  const fetchReminders = async () => {
-    const res = await axios.get('http://localhost:5000/api/reminders');
-    setReminders(res.data);
-  };
+    useEffect(() => {
+      fetchReminders();
+      fetchEmailGroups();
+      fetchCustomers();
+    }, []);
 
-  const fetchEmailGroups = async () => {
-    const res = await axios.get('http://localhost:5000/api/groups');
-    setEmailGroups(res.data);
-  };
+    const fetchReminders = async () => {
+      const res = await axios.get('http://localhost:5000/api/reminders');
+      setReminders(res.data);
+    };
 
-  const fetchCustomers = async () => {
-    const res = await axios.get('http://localhost:5000/api/customers');
-    setCustomers(res.data);
-  };
+    const fetchEmailGroups = async () => {
+      const res = await axios.get('http://localhost:5000/api/groups');
+      setEmailGroups(res.data);
+    };
 
-  const handleOpen = (reminder = null) => {
-    if (reminder) {
-      setFormData({
-        ...reminder,
-        image: reminder.image || null,
-        video: reminder.video || null,
-        date: reminder.date?.slice(0, 16) || '',
-        deliveryMethods: reminder.deliveryMethods || [],
-        email: reminder.email || '',
-        phone: reminder.phone || '',
-        whatsapp: reminder.whatsapp || '',
-        groupemail: reminder.groupemail || []
-      });
-      setEditId(reminder._id);
-    } else {
-      setFormData({
-        title: '', type: 'Custom', notes: '', date: '', recurrence: 'One-time',
-        deliveryMethods: [], email: '', phone: '', whatsapp: '', groupemail: []
-      });
-      setEditId(null);
-    }
-    setDialogOpen(true);
-  };
+    const fetchCustomers = async () => {
+      const res = await axios.get('http://localhost:5000/api/customers');
+      setCustomers(res.data);
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'deliveryMethods' || name === 'groupemail') {
-      setFormData(prev => ({ ...prev, [name]: Array.isArray(value) ? value : [value] }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const data = new FormData();
-      data.append("title", formData.title);
-      data.append("type", formData.type);
-      data.append("notes", formData.notes);
-      data.append("date", formData.date);
-      data.append("recurrence", formData.recurrence);
-      data.append("email", formData.email);
-      data.append("phone", formData.phone);
-      data.append("whatsapp", formData.whatsapp);
-
-      // Ensure deliveryMethods array is always up-to-date
-      const methods = [...formData.deliveryMethods];
-      if (formData.email && !methods.includes("email")) methods.push("email");
-      if (formData.phone && !methods.includes("phone")) methods.push("phone");
-      if (formData.whatsapp && !methods.includes("whatsapp")) methods.push("whatsapp");
-      if (formData.groupemail.length && !methods.includes("emailgroup")) methods.push("emailgroup");
-
-      methods.forEach(m => data.append("deliveryMethods[]", m));
-      formData.groupemail.forEach(e => data.append("groupemail[]", e));
-
-      if (formData.image) data.append("image", formData.image);
-      if (formData.video) data.append("video", formData.video);
-
-      if (editId) {
-        await axios.put(`http://localhost:5000/api/reminders/${editId}`, data, {
-          headers: { "Content-Type": "multipart/form-data" }
+    const handleOpen = (reminder = null) => {
+      if (reminder) {
+        setFormData({
+          ...reminder,
+          image: reminder.image || null,
+          video: reminder.video || null,
+          date: reminder.date?.slice(0, 16) || '',
+          deliveryMethods: reminder.deliveryMethods || [],
+          email: reminder.email || '',
+          phone: reminder.phone || '',
+          whatsapp: reminder.whatsapp || '',
+          groupemail: reminder.groupemail || []
         });
+        setEditId(reminder._id);
       } else {
-        await axios.post("http://localhost:5000/api/reminders", data, {
-          headers: { "Content-Type": "multipart/form-data" }
+        setFormData({
+          title: '', type: 'Custom', notes: '', date: '', recurrence: 'One-time',
+          deliveryMethods: [], email: '', phone: '', whatsapp: '', groupemail: []
         });
+        setEditId(null);
       }
+      setDialogOpen(true);
+    };
 
-      fetchReminders();
-      setDialogOpen(false);
-    } catch (err) {
-      alert("Save failed: " + err.message);
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      if (name === 'deliveryMethods' || name === 'groupemail') {
+        setFormData(prev => ({ ...prev, [name]: Array.isArray(value) ? value : [value] }));
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    };
+
+    const handleSubmit = async () => {
+      try {
+        const data = new FormData();
+        data.append("title", formData.title);
+        data.append("type", formData.type);
+        data.append("notes", formData.notes);
+        data.append("date", formData.date);
+        data.append("recurrence", formData.recurrence);
+        data.append("email", formData.email);
+        data.append("phone", formData.phone);
+        data.append("whatsapp", formData.whatsapp);
+
+        // Ensure deliveryMethods array is always up-to-date
+        const methods = [...formData.deliveryMethods];
+        if (formData.email && !methods.includes("email")) methods.push("email");
+        if (formData.phone && !methods.includes("phone")) methods.push("phone");
+        if (formData.whatsapp && !methods.includes("whatsapp")) methods.push("whatsapp");
+        if (formData.groupemail.length && !methods.includes("emailgroup")) methods.push("emailgroup");
+
+        methods.forEach(m => data.append("deliveryMethods[]", m));
+        formData.groupemail.forEach(e => data.append("groupemail[]", e));
+
+        if (selectedRecipients.length) {
+          if (recipientType === "Individual") {
+            selectedRecipients.forEach(id => data.append("recipients", id));
+          } else if (recipientType === "Group") {
+            selectedRecipients.forEach(id => data.append("groups", id));
+          }
+        }
+
+
+        if (formData.image) data.append("image", formData.image);
+        if (formData.video) data.append("video", formData.video);
+
+        if (editId) {
+          await axios.put(`http://localhost:5000/api/reminders/${editId}`, data, {
+            headers: { "Content-Type": "multipart/form-data" }
+          });
+        } else {
+          await axios.post("http://localhost:5000/api/reminders", data, {
+            headers: { "Content-Type": "multipart/form-data" }
+          });
+        }
+
+        fetchReminders();
+        setDialogOpen(false);
+      } catch (err) {
+        alert("Save failed: " + err.message);
+      }
+    };
+
+    const handleDelete = async (id) => {
+      if (window.confirm('Delete this reminder?')) {
+        await axios.delete(`http://localhost:5000/api/reminders/${id}`);
+        fetchReminders();
+      }
+    };
+
+    const handleRecipientType = async(e) => {
+      const value = e.target.value
+      setRecipientType(value)
+      setSelectedRecipients([])
+
+      if (value === "Individual") {
+        try {
+          const res = await axios.get('http://localhost:5000/api/customers')
+          setCustomerOptions(res.data);
+        } catch (err) {
+          console.log(err)
+        }
+      } else if (value === 'Group'){
+        try {
+        const res = await axios.get('http://localhost:5000/api/groups')
+        setGroupOptions(res.data)
+        } catch (err) {
+          console.log(err)
+        }
+      }
     }
-  };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Delete this reminder?')) {
-      await axios.delete(`http://localhost:5000/api/reminders/${id}`);
-      fetchReminders();
+    const handleSelectChange = (e) => {
+      setSelectedRecipients(e.target.value);
     }
-  };
 
-  return (
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom><SlBell /> Reminder Management</Typography>
-      <Box mb={2}><Button variant="contained" onClick={() => handleOpen()}>+ Add Reminder</Button></Box>
 
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Notes</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Recurrence</TableCell>
-              <TableCell>Delivery</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {reminders.map((r) => (
-              <TableRow key={r._id}>
-                <TableCell>{r.title}</TableCell>
-                <TableCell>{r.type}</TableCell>
-                <TableCell>{r.notes}</TableCell>
-                <TableCell>{new Date(r.date).toLocaleString()}</TableCell>
-                <TableCell>{r.recurrence}</TableCell>
-                <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell>
-                <TableCell>
-                  <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25} /></Button>
-                  <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25} /></Button>
-                </TableCell>
+
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom><SlBell /> Reminder Management</Typography>
+        <Box mb={2}><Button variant="contained" onClick={() => handleOpen()}>+ Add Reminder</Button></Box>
+
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Notes</TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Recurrence</TableCell>
+                {/* <TableCell>Delivery</TableCell> */}
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
-
-      {/* Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>{editId ? 'Edit' : 'Create'} Reminder</DialogTitle>
-        <DialogContent>
-          <TextField fullWidth margin="dense" label="Title" name="title" value={formData.title} onChange={handleChange} />
-          <TextField select fullWidth margin="dense" label="Type" name="type" value={formData.type} onChange={handleChange}>
-            {reminderTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
-          </TextField>
-          <TextField
-            fullWidth
-            margin="dense"
-            label="Notes"
-            name="notes"
-            value={formData.notes}
-            onChange={handleChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton color="primary" component="label">
-                    <MdImage size={22} />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e) =>
-                        setFormData(prev => ({ ...prev, image: e.target.files[0] || null }))
-                      }
-                    />
-                  </IconButton>
-                  <IconButton color="secondary" component="label">
-                    <MdVideoLibrary size={22} />
-                    <input
-                      type="file"
-                      accept="video/*"
-                      hidden
-                      onChange={(e) =>
-                        setFormData(prev => ({ ...prev, video: e.target.files[0] || null }))
-                      }
-                    />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-
-          <TextField
-            fullWidth
-            margin="dense"
-            type="datetime-local"
-            label="Reminder Date"
-            name="date"
-            InputLabelProps={{ shrink: true }}
-            value={formData.date}
-            onChange={handleChange}
-          />
-
-          <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" value={formData.recurrence} onChange={handleChange}>
-            {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
-          </TextField>
-
-          <TextField select fullWidth margin='dense' label='Recipient' name='recipient' value={formData.recipient} >
-            {recipientOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
-          </TextField>
-
-          {/* Delivery Methods */}
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
-            <Select
-              labelId="delivery-methods-label"
-              multiple
-              name="deliveryMethods"
-              value={formData.deliveryMethods}
-              onChange={handleChange}
-              input={<OutlinedInput label="Preferred Choice" />}
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {deliveryOptions.map((method) => (
-                <MenuItem key={method} value={method}>
-                  <Checkbox checked={formData.deliveryMethods.includes(method)} />
-                  <ListItemText primary={method} />
-                </MenuItem>
+            </TableHead>
+            <TableBody>
+              {reminders.map((r) => (
+                <TableRow key={r._id}>
+                  <TableCell>{r.title}</TableCell>
+                  <TableCell>{r.type}</TableCell>
+                  <TableCell>{r.notes}</TableCell>
+                  <TableCell>{new Date(r.date).toLocaleString()}</TableCell>
+                  <TableCell>{r.recurrence}</TableCell>
+                  {/* <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell> */}
+                  <TableCell>
+                    <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25} /></Button>
+                    <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25} /></Button>
+                  </TableCell>
+                </TableRow>
               ))}
-            </Select>
-          </FormControl>
+            </TableBody>
+          </Table>
+        </Paper>
+
+        {/* Dialog */}
+        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+          <DialogTitle>{editId ? 'Edit' : 'Create'} Reminder</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2}>
+            
+                <TextField fullWidth margin="dense" label="Title" name="title" value={formData.title} onChange={handleChange} sx={{ width: '220px' }}/>
+
+                <TextField select fullWidth margin="dense" label="Type" name="type"  sx={{ width: '315px' }}  value={formData.type} onChange={handleChange}>
+                  {reminderTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
+                </TextField>
+
+      
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  type="datetime-local"
+                  label="Reminder Date"
+                  name="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.date}
+                  onChange={handleChange}
+                  sx={{ width: '220px' }}
+              />
+
+              <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" sx={{ width: '315px' }} value={formData.recurrence} onChange={handleChange}>
+                {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+              </TextField>
+
+          {/* customer fetching */}
+            
+              <TextField
+                select
+                fullWidth
+                margin='dense'
+                label='Recipient Type'
+                value={recipientType}
+                onChange={handleRecipientType}
+              >
+                <MenuItem value='Individual'>Individual</MenuItem>
+                <MenuItem value='Group'>Group</MenuItem>
+              </TextField>
+              
+
+            {recipientType === 'Individual' && (
+              <TextField
+                select
+                fullWidth
+                margin='dense'
+                label='Select Customer'
+                value={selectedRecipients}
+                onChange={handleSelectChange}
+                SelectProps={{ 
+                  multiple: true,
+                  renderValue: (selected) => 
+                    customerOptions.filter(c => selected.includes(c._id))
+                    .map(c => c.name)
+                    .join(", ")
+                }}
+              >
+                {customerOptions.map((cust) => (
+                  <MenuItem key={cust._id} value={cust._id}>
+                    <Checkbox checked={selectedRecipients.includes(cust._id)}/>
+                    <ListItemText>{cust.name}</ListItemText>
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+
+            {recipientType === 'Group' && (
+              <TextField
+                select
+                fullWidth
+                margin='dense'
+                label='Select Group'
+                value={selectedRecipients}
+                onChange={handleSelectChange}
+                SelectProps={{ 
+                  multiple: true,
+                  renderValue: (selected) => 
+                    groupOptions.filter(g => selected.includes(g._id))
+                    .map(g => g.name)
+                    .join(", ")
+                }}
+              >
+                {groupOptions.map((gro) => (
+                  <MenuItem key={gro._id} value={gro._id}>
+                    <Checkbox checked={selectedRecipients.includes(gro._id)}/>
+                    <ListItemText>{gro.name}</ListItemText>
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Notes"
+              name="notes"
+              multiline
+              rows={4}
+              value={formData.notes}
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton color="primary" component="label">
+                      <MdImage size={22} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) =>
+                          setFormData(prev => ({ ...prev, image: e.target.files[0] || null }))
+                        }
+                      />
+                    </IconButton>
+                    <IconButton color="secondary" component="label">
+                      <MdVideoLibrary size={22} />
+                      <input
+                        type="file"
+                        accept="video/*"
+                        hidden
+                        onChange={(e) =>
+                          setFormData(prev => ({ ...prev, video: e.target.files[0] || null }))
+                        }
+                      />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
 
 
-          {formData.deliveryMethods.includes('email') && (
-            <Autocomplete
-              options={customers.map(c => c.email).filter(Boolean)}
-              value={formData.email}
-              onChange={(e, value) => setFormData(prev => ({ ...prev, email: value || '' }))}
-              renderInput={(params) => <TextField {...params} label="Email Address" margin="dense" fullWidth />}
-              freeSolo
-            />
-          )}
-          {formData.deliveryMethods.includes('phone') && (
-            <Autocomplete
-              options={customers.map(c => c.phone).filter(Boolean)}
-              value={formData.phone}
-              onChange={(e, value) => setFormData(prev => ({ ...prev, phone: value || '' }))}
-              renderInput={(params) => <TextField {...params} label="Phone Number" margin="dense" fullWidth />}
-              freeSolo
-            />
-          )}
-          {formData.deliveryMethods.includes('whatsapp') && (
-            <TextField fullWidth margin="dense" label="WhatsApp Number" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
-          )}
-          {formData.deliveryMethods.includes('emailgroup') && (
-            <FormControl fullWidth margin="dense">
-              <InputLabel id="email-groups-label">Email Groups</InputLabel>
+
+            {/* Delivery Methods */}
+            {/* <FormControl fullWidth margin="dense">
+              <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
               <Select
-                labelId="email-groups-label"
+                labelId="delivery-methods-label"
                 multiple
-                name="groupemail"
-                value={formData.groupemail}
+                name="deliveryMethods"
+                value={formData.deliveryMethods}
                 onChange={handleChange}
-                input={<OutlinedInput label="Email Groups" />}
+                input={<OutlinedInput label="Preferred Choice" />}
                 renderValue={(selected) => selected.join(', ')}
               >
-                {emailGroups.map((group) => (
-                  <MenuItem key={group._id} value={group.name}>
-                    <Checkbox checked={formData.groupemail.includes(group.name)} />
-                    <ListItemText primary={group.name} />
+                {deliveryOptions.map((method) => (
+                  <MenuItem key={method} value={method}>
+                    <Checkbox checked={formData.deliveryMethods.includes(method)} />
+                    <ListItemText primary={method} />
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl>
-          )}
+            </FormControl> */}
 
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit}>Save</Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
-  );
-}
+
+            {formData.deliveryMethods.includes('email') && (
+              <Autocomplete
+                options={customers.map(c => c.email).filter(Boolean)}
+                value={formData.email}
+                onChange={(e, value) => setFormData(prev => ({ ...prev, email: value || '' }))}
+                renderInput={(params) => <TextField {...params} label="Email Address" margin="dense" fullWidth />}
+                freeSolo
+              />
+            )}
+            {formData.deliveryMethods.includes('phone') && (
+              <Autocomplete
+                options={customers.map(c => c.phone).filter(Boolean)}
+                value={formData.phone}
+                onChange={(e, value) => setFormData(prev => ({ ...prev, phone: value || '' }))}
+                renderInput={(params) => <TextField {...params} label="Phone Number" margin="dense" fullWidth />}
+                freeSolo
+              />
+            )}
+            {formData.deliveryMethods.includes('whatsapp') && (
+              <TextField fullWidth margin="dense" label="WhatsApp Number" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
+            )}
+            {formData.deliveryMethods.includes('emailgroup') && (
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="email-groups-label">Email Groups</InputLabel>
+                <Select
+                  labelId="email-groups-label"
+                  multiple
+                  name="groupemail"
+                  value={formData.groupemail}
+                  onChange={handleChange}
+                  input={<OutlinedInput label="Email Groups" />}
+                  renderValue={(selected) => selected.join(', ')}
+                >
+                  {emailGroups.map((group) => (
+                    <MenuItem key={group._id} value={group.name}>
+                      <Checkbox checked={formData.groupemail.includes(group.name)} />
+                      <ListItemText primary={group.name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+          </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="contained" onClick={handleSubmit}>Save</Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    );
+  }
