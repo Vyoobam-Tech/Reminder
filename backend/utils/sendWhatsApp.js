@@ -35,7 +35,7 @@ const sendWhatsApp = async (phone, name, note = '', image = null, video = null) 
     const message = await client.messages.create({
       from,
       to,
-      body: `Hi ${name}, this is your WhatsApp reminder.${note ? `\n📝 ${note}` : ''}`,
+      body: `${name}, this is your WhatsApp reminder.${note ? `\n ${note}` : ''}`,
       ...(mediaUrls.length ? { mediaUrl: mediaUrls } : {})
     });
 

@@ -118,7 +118,7 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
 
           {/* ABOUT TAB */}
           {tabIndex === 2 && (
-            <Box>
+            <Box sx={{ m:2, p:3}}>
               <Typography variant="h6" gutterBottom>
                 <SlCalender /> Reminder App Features
               </Typography>

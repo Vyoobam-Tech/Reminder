@@ -98,13 +98,13 @@ const DashboardPage = () => {
   };
 
   const statCards = [
-    {
-      label: "Today's Tasks",
-      icon: <EventAvailable />,
-      value: stats.tasksToday,
-      color: '#1976d2',
-      path: "/task"
-    },
+    // {
+    //   label: "Today's Tasks",
+    //   icon: <EventAvailable />,
+    //   value: stats.tasksToday,
+    //   color: '#1976d2',
+    //   path: "/task"
+    // },
     {
       label: 'Upcoming Reminders',
       icon: <AlarmOn />,
@@ -126,13 +126,13 @@ const DashboardPage = () => {
       color: '#9c27b0',
       path: "/customer"
     },
-    {
-      label: 'Total Employees',
-      icon: <Person />,
-      value: stats.employeeCount,
-      color: "#4caf50",
-      path: "/employee",
-    },
+    // {
+    //   label: 'Total Employees',
+    //   icon: <Person />,
+    //   value: stats.employeeCount,
+    //   color: "#4caf50",
+    //   path: "/employee",
+    // },
   ];
 
   return (
@@ -140,7 +140,7 @@ const DashboardPage = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', mb: 3 }}>
         <Typography variant="h4" fontWeight={600}>
-          <SlChart /> Dashboard Analytics
+          <SlChart size={50}/> Dashboard Analytics
         </Typography>
         {/* <MiniCalendar onOpenFull={() => setShowCalendar(true)} /> */}
       </Box>
@@ -169,7 +169,7 @@ const DashboardPage = () => {
         <Typography variant="h6" gutterBottom>
           Recent General Reminders
         </Typography>
-        <Paper elevation={3} sx={{ p: 2 }}>
+        <Paper elevation={3} sx={{ p: 2}}>
           <List>
             {recentReminders.map((r, i) => (
               <React.Fragment key={r._id}>
@@ -187,7 +187,7 @@ const DashboardPage = () => {
       </Box>
 
       {/* Recent Customer Reminders */}
-      <Box mt={5}>
+      {/* <Box mt={5}>
         <Typography variant="h6" gutterBottom>
           Recent Customer Reminders
         </Typography>
@@ -206,7 +206,7 @@ const DashboardPage = () => {
             ))}
           </List>
         </Paper>
-      </Box>
+      </Box> */}
 
       {/* Calendar */}
       <FullOverlayCalendar open={showCalendar} onClose={() => setShowCalendar(false)} />

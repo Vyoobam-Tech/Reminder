@@ -29,10 +29,10 @@ const navItems = [
   { icon: <Dashboard />, label: "Dashboard", path: "/dashboard" },
   { icon: <EditNotifications />, label: "Reminder", path: "/reminder" },
   { icon: <ListAlt />, label: "Customer", path: "/customer" },
-  { icon: <ImManWoman />, label: "Employee", path: "/employee" },
+  // { icon: <ImManWoman />, label: "Employee", path: "/employee" },
   { icon: <Group />, label: "Group", path: "/group" },
   { icon: <Summarize />, label: "Reports", path: "/reminderReport" },
-  { icon: <Task />, label: "Task", path: "/task" },
+  // { icon: <Task />, label: "Task", path: "/task" },
   { icon: <CalendarMonth />, label: "Calendar", path: "/calendar" },
   { icon: <Settings />, label: "Settings", path: "/settings" },
 ];

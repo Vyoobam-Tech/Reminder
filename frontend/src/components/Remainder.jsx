@@ -45,6 +45,7 @@
     const [customerOptions, setCustomerOptions] = useState([])
     const [groupOptions, setGroupOptions] = useState([])
     const [selectedRecipients, setSelectedRecipients] = useState([])
+    const [error, setError] = useState('')
 
     useEffect(() => {
       fetchReminders();
@@ -101,6 +102,10 @@
     };
 
     const handleSubmit = async () => {
+      if (!formData.title || !formData.type || !formData.date || !formData.notes ) {
+        alert("All the fields are required");
+        return;
+      }
       try {
         const data = new FormData();
         data.append("title", formData.title);
@@ -229,7 +234,16 @@
           <DialogContent>
             <Grid container spacing={2}>
             
-                <TextField fullWidth margin="dense" label="Title" name="title" value={formData.title} onChange={handleChange} sx={{ width: '220px' }}/>
+                <TextField 
+                  fullWidth 
+                  margin="dense" 
+                  label="Title" 
+                  name="title" 
+                  value={formData.title} 
+                  onChange={handleChange} 
+                  sx={{ width: '220px' }}
+                  error={!formData.title}
+                />
 
                 <TextField select fullWidth margin="dense" label="Type" name="type"  sx={{ width: '315px' }}  value={formData.type} onChange={handleChange}>
                   {reminderTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
@@ -246,6 +260,7 @@
                   value={formData.date}
                   onChange={handleChange}
                   sx={{ width: '220px' }}
+                  error={!formData.date}
               />
 
               <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" sx={{ width: '315px' }} value={formData.recurrence} onChange={handleChange}>
@@ -283,12 +298,36 @@
                     .join(", ")
                 }}
               >
-                {customerOptions.map((cust) => (
+                {/* {customerOptions.map((cust) => (
                   <MenuItem key={cust._id} value={cust._id}>
                     <Checkbox checked={selectedRecipients.includes(cust._id)}/>
                     <ListItemText>{cust.name}</ListItemText>
                   </MenuItem>
-                ))}
+                ))} */}
+                <Autocomplete
+                  multiple
+                  options={customerOptions}
+                  getOptionLabel={(option) => option.name}
+                  value={customerOptions.filter(c => selectedRecipients.includes(c._id))}
+                  onChange={(e, value) => setSelectedRecipients(value.map(v => v._id))}
+                  disableCloseOnSelect
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <Checkbox checked={selected} style={{ marginRight: 8 }} />
+                      {option.name}
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Customer"
+                      placeholder="Type to search..."
+                      margin="dense"
+                      fullWidth
+                    />
+                  )}
+                  filterSelectedOptions
+                />
               </TextField>
             )}
 
@@ -308,12 +347,36 @@
                     .join(", ")
                 }}
               >
-                {groupOptions.map((gro) => (
+                {/* {groupOptions.map((gro) => (
                   <MenuItem key={gro._id} value={gro._id}>
                     <Checkbox checked={selectedRecipients.includes(gro._id)}/>
                     <ListItemText>{gro.name}</ListItemText>
                   </MenuItem>
-                ))}
+                ))} */}
+                <Autocomplete
+                  multiple
+                  options={groupOptions}
+                  getOptionLabel={(option) => option.name}
+                  value={(groupOptions.filter((g) => selectedRecipients.includes(g._id)))}
+                  onChange={(e, value) => setSelectedRecipients(value.map(v => v._id))}
+                  disableCloseOnSelect
+                  renderOption={(props, option, {selected}) => (
+                    <li {...props}>
+                      <Checkbox checked={selected} style={{ marginRight:8 }}/>
+                      {option.name}
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label='Select Group'
+                      placeholder='Type to Search ...'
+                      margin='dense'
+                      fullWidth
+                    />
+                  )}
+                  filterSelectedOptions
+                />
               </TextField>
             )}
 

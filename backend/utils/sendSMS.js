@@ -34,7 +34,7 @@ const sendSMS = async (phone, name, note = '') => {
   }
 
   // 3️⃣ Construct message
-  const body = `Hi ${name}, this is your SMS reminder.${note ? `\n📝 ${note}` : ''}`;
+  const body = `${name}, this is your SMS reminder.${note ? `\n ${note}` : ''}`;
 
   try {
     const message = await client.messages.create({ body, from, to });

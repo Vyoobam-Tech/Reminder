@@ -1,6 +1,6 @@
-// utils/messageBuilder.js
-const buildReminderMessage = ({ title, notes }) => {
-  return `🔔 Reminder: ${title}\n📝 Notes: ${notes || 'No notes provided.'}`;
-};
+// // utils/messageBuilder.js
+// const buildReminderMessage = ({ title, notes, name }) => {
+//   return `🔔 Reminder: ${name}\n📝 Notes: ${notes || 'No notes provided.'}`;
+// };
 
-export default buildReminderMessage;
+// export default buildReminderMessage;
