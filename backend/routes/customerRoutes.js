@@ -47,9 +47,9 @@ router.post('/', async (req, res) => {
   try {
     const { name, email, phone, purchaseDate, reminderDate, note, address, dob, preferredDelivery,} = req.body;
 
-    if (!name || !email || !phone) {
-      return res.status(400).json({ message: 'Name, email, and phone are required' });
-    }
+    // if (!name || !email || !phone) {
+    //   return res.status(400).json({ message: 'Name, email, and phone are required' });
+    // }
 
     const customer = new Customer({
       name,

@@ -45,7 +45,7 @@
     const [customerOptions, setCustomerOptions] = useState([])
     const [groupOptions, setGroupOptions] = useState([])
     const [selectedRecipients, setSelectedRecipients] = useState([])
-    const [error, setError] = useState('')
+    const [error, setError] = useState({})
 
     useEffect(() => {
       fetchReminders();
@@ -102,10 +102,19 @@
     };
 
     const handleSubmit = async () => {
-      if (!formData.title || !formData.type || !formData.date || !formData.notes ) {
-        alert("All the fields are required");
+      let newErrors = {};
+
+      if (!formData.title) newErrors.title = "Title is required";
+      if (!formData.date) newErrors.date = "Date is required";
+      if (!formData.notes) newErrors.notes = "Notes are required";
+
+      if (Object.keys(newErrors).length > 0) {
+        setError(newErrors); // show inline errors
         return;
       }
+
+      setError({});
+
       try {
         const data = new FormData();
         data.append("title", formData.title);
@@ -243,6 +252,7 @@
                   onChange={handleChange} 
                   sx={{ width: '220px' }}
                   error={!formData.title}
+                  helperText={error.title}
                 />
 
                 <TextField select fullWidth margin="dense" label="Type" name="type"  sx={{ width: '315px' }}  value={formData.type} onChange={handleChange}>
@@ -261,6 +271,7 @@
                   onChange={handleChange}
                   sx={{ width: '220px' }}
                   error={!formData.date}
+                  helperText={error.date}
               />
 
               <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" sx={{ width: '315px' }} value={formData.recurrence} onChange={handleChange}>
@@ -389,6 +400,8 @@
               rows={4}
               value={formData.notes}
               onChange={handleChange}
+              error={!formData.notes}
+              helperText={error.notes}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">

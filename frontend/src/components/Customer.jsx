@@ -19,6 +19,7 @@ import {
   Checkbox,
   ListItemText,
   OutlinedInput,
+  FormHelperText,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -47,6 +48,7 @@ export default function Customer() {
     value: null,
   });
   const [newCustomerDialog, setNewCustomerDialog] = useState(false);
+  const [error,setError] = useState({})
   const [newCustomer, setNewCustomer] = useState({
     name: "",
     email: "",
@@ -235,6 +237,21 @@ export default function Customer() {
   };
 
   const handleAddCustomer = async () => {
+    let newErrors = {}
+
+    if (!newCustomer.name) newErrors.name = 'Name is required'
+    if (!newCustomer.email) newErrors.email = 'Email is required'
+    if (!newCustomer.phone) newErrors.phone = 'Phone is required'
+    if (newCustomer.preferredDelivery.length === 0 ){
+     newErrors.preferredDelivery = 'Preferred Delivery is required'
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setError(newErrors)
+      return
+    }
+
+    setError({})
+
     try {
       await axios.post("http://localhost:5000/api/customers", newCustomer);
       setNewCustomerDialog(false);
@@ -405,6 +422,8 @@ export default function Customer() {
               margin="dense"
               value={newCustomer.name}
               onChange={handleNewCustomerChange}
+              error={!newCustomer.name}
+              helperText={error.name}
             />
             <TextField
               label={t("email")}
@@ -414,6 +433,8 @@ export default function Customer() {
               margin="dense"
               value={newCustomer.email}
               onChange={handleNewCustomerChange}
+              error={!newCustomer.email}
+              helperText={error.email}
             />
             <TextField
               label={t("phone")}
@@ -423,6 +444,8 @@ export default function Customer() {
               margin="dense"
               value={newCustomer.phone}
               onChange={handleNewCustomerChange}
+              error={!newCustomer.phone}
+              helperText={error.phone}
             />
             <TextField
               label={t("purchaseDate")}
@@ -462,7 +485,7 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
 
-            <FormControl fullWidth margin="dense">
+            <FormControl fullWidth margin="dense" error={Boolean(error.preferredDelivery)}>
               <InputLabel id="preferred-label">{t("preferredDelivery")}</InputLabel>
               <Select
                 labelId="preferred-label"
@@ -474,7 +497,7 @@ export default function Customer() {
                 renderValue={(selected) => selected.join(", ")}
               >
                 {deliveryOptions.map((method) => (
-                  <MenuItem key={method} value={method}>
+                  <MenuItem key={method} value={method} >
                     <Checkbox
                       checked={newCustomer.preferredDelivery.includes(method)}
                     />
@@ -482,6 +505,7 @@ export default function Customer() {
                   </MenuItem>
                 ))}
               </Select>
+              <FormHelperText>{error.preferredDelivery}</FormHelperText>
             </FormControl>
           </DialogContent>
           <DialogActions>
