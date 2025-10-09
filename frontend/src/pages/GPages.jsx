@@ -4,7 +4,7 @@ import React from "react";
 import GroupManager from "../group/GroupManager";
 
 
-export default function CustomerPages() {
+export default function GPages() {
   return (
     <div style={{ padding: "20px" }}>
       
