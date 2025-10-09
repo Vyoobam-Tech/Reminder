@@ -126,7 +126,7 @@ const useReminders = () => {
 
   const deleteReminder = (index) => {
     setReminders(reminders.filter((_, i) => i !== index));
-    notifiedRemindersRef.current.delete(index);
+    notifiedRemindersRef.current.delete(index)
   };
 
   return {
