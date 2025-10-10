@@ -13,11 +13,12 @@ import CalendarPage from './pages/CalendarPage';
 import Task from './Task/TaskManager';
 import Employee from './components/Employee';
 import GPages from './pages/GPages';
+import SignupPage from './pages/SignupPage';
 
 const App = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const hideRoutes = ["/"];
+  const hideRoutes = ["/","/signup"];
   const showTopbar = !hideRoutes.includes(location.pathname);
   const showSidebar = !hideRoutes.includes(location.pathname);
   const [darkMode, setDarkMode] = useState(false)
@@ -51,6 +52,7 @@ const App = () => {
         >
           <Routes>
             <Route path="/" element={<LoginPage />} />
+            <Route path='/signup' element={<SignupPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/customer" element={<Customer />} />
             <Route path="/employee" element={<Employee />} />

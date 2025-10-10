@@ -11,8 +11,8 @@ import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 
 
-const LoginForm = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+const SignupForm = () => {
+  // const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -36,7 +36,7 @@ const LoginForm = () => {
     let valid = true;
     let newErrors = {};
 
-    if (isSignUp && formData.username.trim() === "") {
+    if (formData.username.trim() === "") {
       newErrors.username = "Username is required.";
       valid = false;
     }
@@ -46,7 +46,7 @@ const LoginForm = () => {
       valid = false;
     }
 
-    if (isSignUp && !/^\d{10}$/.test(formData.phone)) {
+    if (!/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = "Phone number must be 10 digits.";
       valid = false;
     }
@@ -56,7 +56,7 @@ const LoginForm = () => {
       valid = false;
     }
 
-    if (isSignUp && formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
       valid = false;
     }
@@ -67,9 +67,7 @@ const LoginForm = () => {
       return;
     }
 
-    const API_URL = isSignUp
-      ? "http://localhost:5000/api/auth/signup"
-      : "http://localhost:5000/api/auth/signin";
+    const API_URL = `${import.meta.env.VITE_API_URL}/api/auth/signup`
 
     try {
       const response = await axios.post(API_URL, formData, {
@@ -79,7 +77,7 @@ const LoginForm = () => {
 
       alert(
         response.data.message ||
-          (isSignUp ? "Signup Successful!" : "Login Successful!")
+          "Signup Successful!"
       );
 
 
@@ -94,7 +92,7 @@ const LoginForm = () => {
         })
       );
 
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       setErrors({
         api:
@@ -118,7 +116,7 @@ const LoginForm = () => {
       );
 
       alert(response.data.message || "Google Login Successful!");
-      navigate("/dashboard");
+      navigate("/signup");
     } catch (error) {
       alert(error.response?.data?.message || "Google login failed");
     }
@@ -146,7 +144,7 @@ const LoginForm = () => {
         }}
       >
         <Typography variant="h5" fontWeight="bold" gutterBottom>
-          {isSignUp ? "Sign Up" : "Sign In"}
+          Sign Up
         </Typography>
 
         {errors.api && (
@@ -156,7 +154,7 @@ const LoginForm = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          {isSignUp && (
+          
             <TextField
               label="Username"
               name="username"
@@ -169,7 +167,7 @@ const LoginForm = () => {
               helperText={errors.username}
              
             />
-          )}
+          
 
           <TextField
             label="Email"
@@ -185,7 +183,7 @@ const LoginForm = () => {
             autoComplete="username"
           />
 
-          {isSignUp && (
+       
             <TextField
               label="Phone"
               name="phone"
@@ -198,7 +196,7 @@ const LoginForm = () => {
               error={!!errors.phone}
               helperText={errors.phone}
             />
-          )}
+          
 
           <TextField
             label="Password"
@@ -214,7 +212,7 @@ const LoginForm = () => {
             helperText={errors.password}
           />
 
-          {isSignUp && (
+          
             <TextField
               label="Confirm Password"
               name="confirmPassword"
@@ -228,7 +226,7 @@ const LoginForm = () => {
               helperText={errors.confirmPassword}
                autoComplete="new-password"
             />
-          )}
+        
 
           <Button
             type="submit"
@@ -238,7 +236,7 @@ const LoginForm = () => {
             sx={{ mt: 2, borderRadius: 2 }}
             disabled={loading}
           >
-            {loading ? "Processing..." : isSignUp ? "Sign Up" : "Sign In"}
+            Sign Up
           </Button>
         </form>
 
@@ -254,20 +252,21 @@ const LoginForm = () => {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleFailure}
+            clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
           />
         </Box>
 
         <Button
-          onClick={() => setIsSignUp(!isSignUp)}
+          onClick={() => navigate("/")}
           sx={{ mt: 2, textTransform: "none", color: "primary.main" }}
         >
-          {isSignUp
-            ? "Already have an account? Sign In"
-            : "Don't have an account? Sign Up"}
+          
+            Already have an account? Sign In
+
         </Button>
       </Paper>
     </Box>
   );
 };
 
-export default LoginForm;
+export default SignupForm;
