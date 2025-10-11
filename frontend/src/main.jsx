@@ -6,10 +6,11 @@ import theme from "./styles/theme";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-
+// const clientId = "905445201561-7mtnovjg5aalpjv6u1854ctbmk5bgm9s.apps.googleusercontent.com"
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+  <GoogleOAuthProvider clientId={clientId}>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <CssBaseline />

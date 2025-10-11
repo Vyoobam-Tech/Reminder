@@ -19,7 +19,9 @@ import path from 'path'
 dotenv.config();
 const app = express();
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://69.62.81.150:9000'],
+const CLIENT_URL= process.env.CLIENT_URL || 'http://localhost:5173'
+
+app.use(cors({ origin: [CLIENT_URL],
       credentials: true,
       methods: ['GET', "POST", "PUT", "DELETE"]}));
 app.use(express.json());

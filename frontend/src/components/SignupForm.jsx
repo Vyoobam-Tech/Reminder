@@ -24,6 +24,8 @@ const SignupForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -67,10 +69,11 @@ const SignupForm = () => {
       return;
     }
 
-    const API_URL = `${import.meta.env.VITE_API_URL}/api/auth/signup`
+    console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID); // should log your client ID
+
 
     try {
-      const response = await axios.post(API_URL, formData, {
+      const response = await axios.post(`${API_URL}/api/auth/signup`, formData, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true // send cookies
       });
@@ -108,7 +111,7 @@ const SignupForm = () => {
     try {
 
       const response = await axios.post(
-        "http://localhost:5000/api/auth/google",
+        `${API_URL}/api/auth/google`,
         {
           token: credentialResponse.credential
         },
@@ -116,7 +119,7 @@ const SignupForm = () => {
       );
 
       alert(response.data.message || "Google Login Successful!");
-      navigate("/signup");
+      navigate("/dashboard");
     } catch (error) {
       alert(error.response?.data?.message || "Google login failed");
     }
@@ -252,7 +255,6 @@ const SignupForm = () => {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleFailure}
-            clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
           />
         </Box>
 

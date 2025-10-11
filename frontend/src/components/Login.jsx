@@ -51,7 +51,7 @@ const Login = () => {
 
     alert(
         response.data.message ||
-           "Login Successful!"
+          "Login Successful!"
       );
 
       navigate("/dashboard");
@@ -84,7 +84,7 @@ const Login = () => {
         }}
       >
         <Typography variant="h5" fontWeight="bold" gutterBottom>
-          sing in
+          Sign In
         </Typography>
 
         {errors.api && (
