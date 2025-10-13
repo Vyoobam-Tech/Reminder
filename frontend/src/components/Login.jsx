@@ -41,7 +41,8 @@ const Login = () => {
       return;
     }
 
-    const API_URL = `${import.meta.env.VITE_API_URL}/api/auth/signin`;
+    // const API_URL = `${import.meta.env.VITE_API_URL}/api/auth/signin`;
+    const API_URL = `${import.meta.env.SERVER_URL}/api/auth/signin` ;
 
     try {
       const response = await axios.post(API_URL, formData, {

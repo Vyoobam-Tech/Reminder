@@ -24,7 +24,8 @@ const SignupForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_API_URL
+  // const API_URL = import.meta.env.VITE_API_URL
+  const API_URL = process.env.SERVER_URL;
 
 
   const handleChange = (e) => {
