@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import {
   TextField,
   Button,
@@ -15,7 +16,7 @@ export default function ReminderTemplatesForm() {
   const [templates, setTemplates] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/settings').then(res => {
+    API.get('/api/settings').then(res => {
       if (res.data?.reminderTemplates) setTemplates(res.data.reminderTemplates);
     });
   }, []);
@@ -36,7 +37,7 @@ export default function ReminderTemplatesForm() {
   };
 
   const handleSave = async () => {
-    await axios.put('/api/settings', { reminderTemplates: templates });
+    await API.put('/api/settings', { reminderTemplates: templates });
     alert('Templates saved!');
   };
 

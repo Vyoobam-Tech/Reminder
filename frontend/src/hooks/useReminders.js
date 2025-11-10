@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../api/axiosInstance";
 import { filterValidFiles, getPreviews } from "../utils/fileUtils";
 
 const useReminders = () => {
@@ -46,8 +47,8 @@ const useReminders = () => {
             formData.append("attachments", file);
           });
 
-          axios
-            .post("http://localhost:5000/send-email", formData)
+          API
+            .post("/send-email", formData)
             .then((res) => {
               console.log("Email sent and data saved:", res.data);
             })

@@ -17,7 +17,8 @@ import {
   Group,
   Person
 } from '@mui/icons-material';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import MiniCalendar from '../Calendar/MiniCalendar';
 import FullOverlayCalendar from '../Calendar/FullOverlayCalendar';
 import { SlChart,  SlBell } from "react-icons/sl";
@@ -46,10 +47,10 @@ const DashboardPage = () => {
   const fetchStats = async () => {
     try {
       const [taskRes, reminderRes, customerRes, employeeRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/tasks'),
-        axios.get('http://localhost:5000/api/reminders'),
-        axios.get('http://localhost:5000/api/customers'),
-        axios.get('http://localhost:5000/api/employee'),
+        API.get('/api/tasks'),
+        API.get('/api/reminders'),
+        API.get('/api/customers'),
+        API.get('/api/employee'),
       ]);
 
       const now = new Date();
@@ -76,7 +77,7 @@ const DashboardPage = () => {
 
   const fetchRecentReminders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/reminders');
+      const res = await API.get('/api/reminders');
       const sorted = res.data.sort((a, b) => new Date(b.date) - new Date(a.date));
       setRecentReminders(sorted.slice(0, 5));
     } catch (err) {
@@ -86,7 +87,7 @@ const DashboardPage = () => {
 
   const fetchRecentCustomerReminders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/customers');
+      const res = await API.get('/api/customers');
       const filtered = res.data.filter((c) => c.reminderDate);
       const sorted = filtered.sort(
         (a, b) => new Date(b.reminderDate) - new Date(a.reminderDate)

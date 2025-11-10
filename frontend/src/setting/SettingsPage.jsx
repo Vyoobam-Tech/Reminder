@@ -17,7 +17,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { IoSettingsSharp } from "react-icons/io5";
-import axios from "axios";
+// import axios from "axios";
+import API from "../api/axiosInstance";
 import { SlChart, SlBell, SlCalender } from "react-icons/sl";
 import { MdTask } from "react-icons/md";
 import { LuMessageCircleMore } from "react-icons/lu";
@@ -31,7 +32,7 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/profile", {
+        const res = await API.get("/api/auth/profile", {
           withCredentials: true,
         });
         setUser(res.data.user);

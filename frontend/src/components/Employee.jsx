@@ -20,7 +20,8 @@ import {
 } from "@mui/material";
 import { MdDelete } from "react-icons/md";
 import { DataGrid } from "@mui/x-data-grid";
-import axios from "axios";
+// import axios from "axios";
+import API from "../api/axiosInstance";
 import i18n from "../i18n";
 import { useTranslation } from "react-i18next";
 
@@ -58,7 +59,7 @@ const Employee = () => {
 
   const fetchEmployee = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/employee");
+      const res = await API.get("/api/employee");
       setEmployees(res.data);
     } catch {
       alert("Failed to fetch employees");
@@ -77,8 +78,8 @@ const Employee = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/employee",
+      const response = await API.post(
+        "/api/employee",
         newEmployee
       );
       setEmployees([...employees, response.data]);
@@ -102,7 +103,7 @@ const Employee = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/employee/${id}`);
+      await API.delete(`/api/employee/${id}`);
       setEmployees(employees.filter((e) => e._id !== id));
     } catch (error) {
       alert("Failed to delete employee. Try again.");

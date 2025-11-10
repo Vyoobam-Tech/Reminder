@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import {
   Container, Typography, Paper, Button, TextField, Autocomplete, Dialog,
   DialogTitle, DialogContent, DialogActions, IconButton, Checkbox
@@ -20,8 +21,8 @@ function GroupManager() {
 
   const fetchData = async () => {
     const [custRes, groupRes] = await Promise.all([
-      axios.get('http://localhost:5000/api/customers'),
-      axios.get('http://localhost:5000/api/groups'),
+      API.get('/api/customers'),
+      API.get('/api/groups'),
     ]);
     setCustomers(custRes.data);
     setGroups(groupRes.data);
@@ -33,7 +34,7 @@ function GroupManager() {
       return;
     }
 
-    await axios.post('http://localhost:5000/api/groups', {
+    await API.post('/api/groups', {
       name: groupName,
       members: selectedIds
     });
@@ -51,7 +52,7 @@ function GroupManager() {
   };
 
   const handleUpdateGroup = async () => {
-    await axios.put(`http://localhost:5000/api/groups/${editingGroup._id}`, {
+    await API.put(`/api/groups/${editingGroup._id}`, {
       name: groupName,
       members: selectedIds,
     });
@@ -65,7 +66,7 @@ function GroupManager() {
 
   const handleDeleteGroup = async (groupId) => {
     if (!window.confirm('Are you sure you want to delete this group?')) return;
-    await axios.delete(`http://localhost:5000/api/groups/${groupId}`);
+    await API.delete(`/api/groups/${groupId}`);
     fetchData();
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import {
   Container, Typography, TextField, Button, Paper,
   Box, List, ListItem, ListItemText, IconButton, MenuItem
@@ -15,7 +16,7 @@ export default function Notes() {
   // Fetch notes filtered by customerId (if selected)
   const fetchNotes = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/notes', {
+      const res = await API.get('/api/notes', {
         params: customerId ? { customerId } : {},
       });
       setNotes(res.data);
@@ -27,7 +28,7 @@ export default function Notes() {
   // Fetch customers for dropdown
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/customers');
+      const res = await API.get('/api/customers');
       setCustomers(res.data);
     } catch (err) {
       console.error('Failed to fetch customers:', err);
@@ -46,7 +47,7 @@ export default function Notes() {
   const addNote = async () => {
     if (!text) return alert('Please enter a note');
     try {
-      await axios.post('http://localhost:5000/api/notes', {
+      await API.post('/api/notes', {
         text,
         customer: customerId || null,
       });
@@ -61,7 +62,7 @@ export default function Notes() {
   const deleteNote = async (id) => {
     if (!window.confirm('Delete this note?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/notes/${id}`);
+      await API.delete(`/api/notes/${id}`);
       fetchNotes();
     } catch (err) {
       alert('Delete failed');

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+// import axios from "axios";
+import API from "../api/axiosInstance";
 import {
   Container,
   Typography,
@@ -87,7 +88,7 @@ export default function Customer() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/customers");
+      const res = await API.get("/api/customers");
       setCustomers(res.data);
     } catch {
       alert("Failed to fetch customers");
@@ -106,8 +107,8 @@ export default function Customer() {
     formData.append("file", new Blob([fileBuffer]), "uploaded.xlsx");
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/customers/upload",
+      const res = await API.post(
+        "/api/customers/upload",
         formData,
       );
       const { insertedCount, skipped = [] } = res.data;
@@ -159,7 +160,7 @@ export default function Customer() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this customer?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/customers/${id}`);
+      await API.delete(`/api/customers/${id}`);
       fetchCustomers();
     } catch {
       alert("Delete failed");
@@ -182,8 +183,8 @@ export default function Customer() {
 
   const handleEditSave = async () => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/customers/${editCustomer._id}`,
+      await API.put(
+        `/api/customers/${editCustomer._id}`,
         editCustomer,
       );
       setEditCustomer(null);
@@ -206,8 +207,8 @@ export default function Customer() {
       const formattedDate = reminderEdit.value
         ? new Date(reminderEdit.value).toISOString()
         : null;
-      await axios.put(
-        `http://localhost:5000/api/customers/${reminderEdit.id}`,
+      await API.put(
+        `/api/customers/${reminderEdit.id}`,
         {
           reminderDate: formattedDate,
         },
@@ -220,7 +221,7 @@ export default function Customer() {
   };
 
   const handleNoteChange = async (id, note) => {
-    await axios.put(`http://localhost:5000/api/customers/${id}`, { note });
+    await API.put(`/api/customers/${id}`, { note });
     fetchCustomers();
   };
 
@@ -253,7 +254,7 @@ export default function Customer() {
     setError({})
 
     try {
-      await axios.post("http://localhost:5000/api/customers", newCustomer);
+      await API.post("/api/customers", newCustomer);
       setNewCustomerDialog(false);
       setNewCustomer({
         name: "",

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import { TextField, Button, Typography, Stack } from '@mui/material';
 
 export default function BusinessInfoForm() {
   const [info, setInfo] = useState({ name: '', address: '', phone: '', email: '', website: '' });
 
   useEffect(() => {
-    axios.get('/api/settings').then(res => {
+    API.get('/api/settings').then(res => {
       if (res.data?.businessInfo) setInfo(res.data.businessInfo);
     });
   }, []);
@@ -14,7 +15,7 @@ export default function BusinessInfoForm() {
   const handleChange = (e) => setInfo({ ...info, [e.target.name]: e.target.value });
 
   const handleSave = async () => {
-    await axios.put('/api/settings', { businessInfo: info });
+    await API.put('/api/settings', { businessInfo: info });
     alert('Business Info saved!');
   };
 

@@ -9,7 +9,8 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField
 } from '@mui/material';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 
 export default function CalendarView() {
   const [events, setEvents] = useState([]);
@@ -17,7 +18,7 @@ export default function CalendarView() {
   const [open, setOpen] = useState(false);
 
   const fetchEvents = async () => {
-    const res = await axios.get('http://localhost:5000/api/reminders/calendar');
+    const res = await API.get('/api/reminders/calendar');
     setEvents(res.data);
   };
 
@@ -45,9 +46,9 @@ export default function CalendarView() {
   const handleSave = async () => {
     try {
       if (form._id) {
-        await axios.put(`http://localhost:5000/api/reminders/${form._id}`, form);
+        await API.put(`/api/reminders/${form._id}`, form);
       } else {
-        await axios.post(`http://localhost:5000/api/reminders`, form);
+        await API.post("/api/reminders", form);
       }
       setOpen(false);
       fetchEvents();
@@ -58,7 +59,7 @@ export default function CalendarView() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/reminders/${form._id}`);
+      await API.delete(`/api/reminders/${form._id}`);
       setOpen(false);
       fetchEvents();
     } catch (err) {

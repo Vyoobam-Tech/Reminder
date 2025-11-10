@@ -1,6 +1,7 @@
   // ✅ FRONTEND - Reminder.jsx
   import React, { useEffect, useState } from 'react';
-  import axios from 'axios';
+  // import axios from 'axios';
+  import API from '../api/axiosInstance';
   import {
     Container, Typography, Button, Table, TableHead, TableBody, TableRow, TableCell,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, Paper, Box,
@@ -54,17 +55,17 @@
     }, []);
 
     const fetchReminders = async () => {
-      const res = await axios.get('http://localhost:5000/api/reminders');
+      const res = await API.get('/api/reminders');
       setReminders(res.data);
     };
 
     const fetchEmailGroups = async () => {
-      const res = await axios.get('http://localhost:5000/api/groups');
+      const res = await API.get('/api/groups');
       setEmailGroups(res.data);
     };
 
     const fetchCustomers = async () => {
-      const res = await axios.get('http://localhost:5000/api/customers');
+      const res = await API.get('/api/customers');
       setCustomers(res.data);
     };
 
@@ -149,11 +150,11 @@
         if (formData.video) data.append("video", formData.video);
 
         if (editId) {
-          await axios.put(`http://localhost:5000/api/reminders/${editId}`, data, {
+          await API.put(`/api/reminders/${editId}`, data, {
             headers: { "Content-Type": "multipart/form-data" }
           });
         } else {
-          await axios.post("http://localhost:5000/api/reminders", data, {
+          await API.post("/api/reminders", data, {
             headers: { "Content-Type": "multipart/form-data" }
           });
         }
@@ -167,7 +168,7 @@
 
     const handleDelete = async (id) => {
       if (window.confirm('Delete this reminder?')) {
-        await axios.delete(`http://localhost:5000/api/reminders/${id}`);
+        await API.delete(`/api/reminders/${id}`);
         fetchReminders();
       }
     };
@@ -179,14 +180,14 @@
 
       if (value === "Individual") {
         try {
-          const res = await axios.get('http://localhost:5000/api/customers')
+          const res = await API.get('/api/customers')
           setCustomerOptions(res.data);
         } catch (err) {
           console.log(err)
         }
       } else if (value === 'Group'){
         try {
-        const res = await axios.get('http://localhost:5000/api/groups')
+        const res = await API.get('/api/groups')
         setGroupOptions(res.data)
         } catch (err) {
           console.log(err)

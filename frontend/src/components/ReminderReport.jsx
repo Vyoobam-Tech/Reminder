@@ -1,11 +1,12 @@
 // components/ReportPanel.jsx
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import { Box, Button ,Stack,Typography} from '@mui/material';
 
 export default function ReportPanel() {
   const exportCustomers = async (type) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/reports/export?type=${type}`, {
+      const res = await API.get(`/api/reports/export?type=${type}`, {
         responseType: 'blob',
       });
 

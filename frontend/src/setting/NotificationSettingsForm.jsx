@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
+import API from '../api/axiosInstance';
 import { Typography, Stack, TextField, Button, FormControlLabel, Switch } from '@mui/material';
 
 export default function NotificationSettingsForm() {
@@ -11,7 +12,7 @@ export default function NotificationSettingsForm() {
   });
 
   useEffect(() => {
-    axios.get('/api/settings').then(res => {
+    API.get('/api/settings').then(res => {
       if (res.data?.notifications) setNotify(res.data.notifications);
     });
   }, []);
@@ -22,7 +23,7 @@ export default function NotificationSettingsForm() {
   };
 
   const handleSave = async () => {
-    await axios.put('/api/settings', { notifications: notify });
+    await API.put('/api/settings', { notifications: notify });
     alert('Notification settings saved!');
   };
 
