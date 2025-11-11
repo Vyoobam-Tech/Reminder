@@ -12,7 +12,7 @@ import noteRoutes from './routes/noteRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
-import groupRoutes from './routes/groupRoutes.js';
+// import groupRoutes from './routes/groupRoutes.js';
 import path from 'path'
 
 
@@ -39,7 +39,7 @@ app.use('/api/notes', noteRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/tasks', taskRoutes);
-app.use('/api/groups', groupRoutes);
+// app.use('/api/groups', groupRoutes);
 
 
 

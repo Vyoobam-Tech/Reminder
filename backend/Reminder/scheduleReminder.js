@@ -2,7 +2,7 @@ import cron from "node-cron";
 import sendEmail from "../utils/sendEmail.js";
 import sendSMS from "../utils/sendSMS.js";
 import sendWhatsApp from "../utils/sendWhatsApp.js";
-import Group from "../models/Group.js";
+// import Group from "../models/Group.js";
 import Reminder from "../models/Reminder.js";
 
 const scheduleReminder = (reminder) => {
