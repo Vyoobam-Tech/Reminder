@@ -12,7 +12,6 @@ import SettingsPage from './setting/SettingsPage';
 import CalendarPage from './pages/CalendarPage';
 import Task from './Task/TaskManager';
 import Employee from './components/Employee';
-// import GroupPage from './pages/GroupPage';
 import SignupPage from './pages/SignupPage';
 
 const App = () => {
@@ -61,7 +60,6 @@ const App = () => {
             <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode}/>} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/task" element={<Task />} />
-            {/* <Route path="/group" element={<GroupPage />} /> */}
           </Routes>
         </Box>
       </Box>
