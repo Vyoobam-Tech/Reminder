@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 
-const groupSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
-});
+// const groupSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }],
+// });
 
-export default mongoose.model('Group', groupSchema);
+// export default mongoose.model('Group', groupSchema);
