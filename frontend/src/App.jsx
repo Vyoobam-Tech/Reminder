@@ -11,6 +11,7 @@ import ReminderReport from './components/ReminderReport';
 import SettingsPage from './setting/SettingsPage';
 import CalendarPage from './pages/CalendarPage';
 import Task from './Task/TaskManager';
+import GroupPage from './pages/GroupPage';
 import Employee from './components/Employee';
 import SignupPage from './pages/SignupPage';
 
@@ -60,6 +61,7 @@ const App = () => {
             <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode}/>} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/task" element={<Task />} />
+            <Route path="/groupx  " element={<GroupPage />} />
           </Routes>
         </Box>
       </Box>
