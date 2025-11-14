@@ -1,16 +1,20 @@
   // ✅ FRONTEND - Reminder.jsx
-  import React, { useEffect, useState } from 'react';
-  // import axios from 'axios';
-  import API from '../api/axiosInstance';
-  import {
+import React, { useEffect, useState } from 'react';
+import API from '../api/axiosInstance';
+import {
     Container, Typography, Button, Table, TableHead, TableBody, TableRow, TableCell,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, Paper, Box,
     Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel, OutlinedInput, Autocomplete,
     IconButton, InputAdornment,
     Grid
   } from '@mui/material';
-  import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
-  import { SlBell } from "react-icons/sl";
+import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
+import { SlBell } from "react-icons/sl";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+
+
 
   const reminderTypes = [
     'Meeting', 'Client Follow-up', 'Payment Due',
@@ -47,6 +51,10 @@
     const [groupOptions, setGroupOptions] = useState([])
     const [selectedRecipients, setSelectedRecipients] = useState([])
     const [error, setError] = useState({})
+
+    const [value, setValue] = useState(null);
+    const [dateSelected, setDateSelected] = useState(false);
+
 
     useEffect(() => {
       fetchReminders();
@@ -102,11 +110,40 @@
       }
     };
 
+    // const handleDateChange = (e) => {
+    //   handleChange(e);
+
+    //   const value = e.target.value; // "2025-11-22T14:40"
+    //   if (value && value.length >= 16) {
+    //     // Only close if both date + time selected
+    //     e.target.blur();
+    //   }
+    // };
+
+    const handleDateChange = (newValue) => {
+    setValue(newValue);
+
+    if (!dateSelected) {
+      // first step: user selected date, now wait for time
+      setDateSelected(true);
+      return;
+    }
+
+    // second step: user selected time → auto-close
+    setDateSelected(false); // reset for next pick
+  };
+
+
+
     const handleSubmit = async () => {
       let newErrors = {};
 
       if (!formData.title) newErrors.title = "Title is required";
       if (!formData.date) newErrors.date = "Date is required";
+      if (!recipientType) newErrors.recipientType = "Recipient type is required";
+      if (recipientType && selectedRecipients.length === 0)
+        newErrors.selectedRecipients = "Please select at least one";
+
       if (!formData.notes) newErrors.notes = "Notes are required";
 
       if (Object.keys(newErrors).length > 0) {
@@ -225,7 +262,7 @@
                   <TableCell>{r.title}</TableCell>
                   <TableCell>{r.type}</TableCell>
                   <TableCell>{r.notes}</TableCell>
-                  <TableCell>{new Date(r.date).toLocaleString()}</TableCell>
+                  <TableCell>{(r.date).toLocaleString().replace("T"," ").slice(0, 16)}</TableCell>
                   <TableCell>{r.recurrence}</TableCell>
                   {/* <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell> */}
                   <TableCell>
@@ -261,19 +298,14 @@
                 </TextField>
 
       
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  type="datetime-local"
-                  label="Reminder Date"
-                  name="date"
-                  InputLabelProps={{ shrink: true }}
-                  value={formData.date}
-                  onChange={handleChange}
-                  sx={{ width: '220px' }}
-                  error={!formData.date}
-                  helperText={error.date}
-              />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    label="Select Date & Time"
+                    value={value}
+                    onChange={handleDateChange}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                  />
+                </LocalizationProvider>
 
               <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" sx={{ width: '315px' }} value={formData.recurrence} onChange={handleChange}>
                 {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
@@ -288,6 +320,9 @@
                 label='Recipient Type'
                 value={recipientType}
                 onChange={handleRecipientType}
+                error={!!error.recipientType}
+                helperText={error.recipientType}
+
               >
                 <MenuItem value='Individual'>Individual</MenuItem>
                 <MenuItem value='Group'>Group</MenuItem>
@@ -336,6 +371,8 @@
                       placeholder="Type to search..."
                       margin="dense"
                       fullWidth
+                      error={!!error.selectedRecipients}
+                      helperText={error.selectedRecipients}
                     />
                   )}
                   filterSelectedOptions
@@ -385,6 +422,8 @@
                       placeholder='Type to Search ...'
                       margin='dense'
                       fullWidth
+                      error={!!error.selectedRecipients}
+                      helperText={error.selectedRecipients}
                     />
                   )}
                   filterSelectedOptions

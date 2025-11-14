@@ -306,9 +306,11 @@ export default function Customer() {
   const rows = customers.filter((c) => c.name.toLowerCase().startsWith(search.toLowerCase())
   ).map((c, idx) => ({
     id: idx + 1,
-    ...c
+    ...c,
+    purchaseDate: c.purchaseDate ? c.purchaseDate.split("T")[0] : "",
+    dob: c.dob ? c.dob.split("T")[0] : "",
   }
-  )) 
+  ))
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
