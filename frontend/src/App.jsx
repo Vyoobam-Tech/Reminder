@@ -61,7 +61,7 @@ const App = () => {
             <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode}/>} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/task" element={<Task />} />
-            <Route path="/groupx  " element={<GroupPage />} />
+            <Route path="/group " element={<GroupPage />} />
           </Routes>
         </Box>
       </Box>
