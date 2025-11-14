@@ -46,11 +46,11 @@ export const signin = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 3600000, // 1 hour
-      sameSite: isProduction ? "none" : "lax",
-      secure: isProduction
-
+      secure: true,
+      sameSite: "None",
+      maxAge: 3600000,
     });
+
 
     res.json({ message: "Login successful!" });
   } catch (error) {
