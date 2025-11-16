@@ -1,4 +1,3 @@
-// 📁 src/components/CalendarView.js
 import React, { useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,7 +8,6 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField
 } from '@mui/material';
-// import axios from 'axios';
 import API from '../api/axiosInstance';
 
 export default function CalendarView() {
@@ -20,20 +18,36 @@ export default function CalendarView() {
   const fetchEvents = async () => {
     try {
       const res = await API.get("/api/reminders/calendar");
-      setEvents(res.data);
+
+      const localEvents = res.data.map(event => {
+        const date = new Date(event.start);
+
+        // Fix UTC → Local
+        const corrected = new Date(
+          date.getTime() - date.getTimezoneOffset() * 60000
+        ).toISOString();
+
+        return {
+          ...event,
+          start: corrected, // now calendar shows correct local time
+        };
+      });
+
+      setEvents(localEvents);
     } catch (err) {
       console.error("Calendar load error:", err);
     }
   };
 
+
   useEffect(() => {
     fetchEvents();
   }, []);
 
-  const handleDateClick = (arg) => {
-    setForm({ title: '', date: arg.dateStr + 'T09:00', _id: null });
-    setOpen(true);
-  };
+  // const handleDateClick = (arg) => {
+  //   setForm({ title: '', date: arg.dateStr + 'T09:00', _id: null });
+  //   setOpen(true);
+  // };
 
   // const handleEventClick = (arg) => {
   //   const event = events.find(e => e.id === arg.event.id);
@@ -88,7 +102,7 @@ export default function CalendarView() {
               right: 'dayGridMonth,timeGridWeek,timeGridDay',
             }}
             events={events}
-            dateClick={handleDateClick}
+            // dateClick={handleDateClick}
             // eventClick={handleEventClick}
             editable={false}
           />

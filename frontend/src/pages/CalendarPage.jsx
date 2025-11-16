@@ -12,9 +12,9 @@ export default function CustomerPages() {
     <CalendarView />
   </Box>
 
-  <Box sx={{ mb: 4 }}>
+  {/* <Box sx={{ mb: 4 }}>
     <UserTimeline />
-  </Box>
+  </Box> */}
 </Container>
   );
 }
