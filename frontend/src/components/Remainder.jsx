@@ -1,4 +1,3 @@
-  // ✅ FRONTEND - Reminder.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../api/axiosInstance';
 import {
@@ -10,11 +9,6 @@ import {
   } from '@mui/material';
 import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
 import { SlBell } from "react-icons/sl";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-
-
 
   const reminderTypes = [
     'Meeting', 'Client Follow-up', 'Payment Due',
@@ -51,10 +45,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
     const [groupOptions, setGroupOptions] = useState([])
     const [selectedRecipients, setSelectedRecipients] = useState([])
     const [error, setError] = useState({})
-
-    const [value, setValue] = useState(null);
-    const [dateSelected, setDateSelected] = useState(false);
-
 
     useEffect(() => {
       fetchReminders();
@@ -110,31 +100,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
       }
     };
 
-    // const handleDateChange = (e) => {
-    //   handleChange(e);
-
-    //   const value = e.target.value; // "2025-11-22T14:40"
-    //   if (value && value.length >= 16) {
-    //     // Only close if both date + time selected
-    //     e.target.blur();
-    //   }
-    // };
-
-    const handleDateChange = (newValue) => {
-    setValue(newValue);
-
-    if (!dateSelected) {
-      // first step: user selected date, now wait for time
-      setDateSelected(true);
-      return;
-    }
-
-    // second step: user selected time → auto-close
-    setDateSelected(false); // reset for next pick
-  };
-
-
-
     const handleSubmit = async () => {
       let newErrors = {};
 
@@ -143,7 +108,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
       if (!recipientType) newErrors.recipientType = "Recipient type is required";
       if (recipientType && selectedRecipients.length === 0)
         newErrors.selectedRecipients = "Please select at least one";
-
       if (!formData.notes) newErrors.notes = "Notes are required";
 
       if (Object.keys(newErrors).length > 0) {
@@ -235,6 +199,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
     const handleSelectChange = (e) => {
       setSelectedRecipients(e.target.value);
     }
+    
 
 
 
@@ -262,7 +227,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                   <TableCell>{r.title}</TableCell>
                   <TableCell>{r.type}</TableCell>
                   <TableCell>{r.notes}</TableCell>
-                  <TableCell>{(r.date).toLocaleString().replace("T"," ").slice(0, 16)}</TableCell>
+                  <TableCell>{new Date(r.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</TableCell>
                   <TableCell>{r.recurrence}</TableCell>
                   {/* <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell> */}
                   <TableCell>
@@ -298,14 +263,19 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                 </TextField>
 
       
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    label="Select Date & Time"
-                    value={value}
-                    onChange={handleDateChange}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
-                  />
-                </LocalizationProvider>
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  type="datetime-local"
+                  label="Reminder Date"
+                  name="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.date}
+                  onChange={handleChange}
+                  sx={{ width: '220px' }}
+                  error={!formData.date}
+                  helperText={error.date}
+              />
 
               <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" sx={{ width: '315px' }} value={formData.recurrence} onChange={handleChange}>
                 {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
@@ -322,7 +292,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                 onChange={handleRecipientType}
                 error={!!error.recipientType}
                 helperText={error.recipientType}
-
               >
                 <MenuItem value='Individual'>Individual</MenuItem>
                 <MenuItem value='Group'>Group</MenuItem>
@@ -337,6 +306,8 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                 label='Select Customer'
                 value={selectedRecipients}
                 onChange={handleSelectChange}
+                error={!!error.selectedRecipients}
+                helperText={error.selectedRecipients}
                 SelectProps={{ 
                   multiple: true,
                   renderValue: (selected) => 
@@ -371,8 +342,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                       placeholder="Type to search..."
                       margin="dense"
                       fullWidth
-                      error={!!error.selectedRecipients}
-                      helperText={error.selectedRecipients}
                     />
                   )}
                   filterSelectedOptions
@@ -388,6 +357,8 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                 label='Select Group'
                 value={selectedRecipients}
                 onChange={handleSelectChange}
+                error={!!error.selectedRecipients}
+                helperText={error.selectedRecipients}
                 SelectProps={{ 
                   multiple: true,
                   renderValue: (selected) => 
@@ -422,8 +393,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
                       placeholder='Type to Search ...'
                       margin='dense'
                       fullWidth
-                      error={!!error.selectedRecipients}
-                      helperText={error.selectedRecipients}
                     />
                   )}
                   filterSelectedOptions
