@@ -81,6 +81,10 @@ router.post(
           : null,
       };
 
+      if (body.date) {
+        reminderData.date = body.date;   // store EXACT STRING
+      }
+
       const reminder = await Reminder.create(reminderData);
       scheduleReminder(reminder);
 
@@ -138,6 +142,11 @@ router.put(
           size: files.video[0].size,
         };
       }
+
+      if (body.date) {
+        updateData.date = body.date;   // store EXACT STRING
+      }
+
 
       const reminder = await Reminder.findByIdAndUpdate(req.params.id, updateData, {
         new: true,

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const FileSchema = new mongoose.Schema({
   filename: String,
@@ -12,7 +13,7 @@ const reminderSchema = new mongoose.Schema({
   title: String,
   type: { type: String, default: "Custom" },
   notes: String,
-  date: Date,
+  date: {type: Date},
   recurrence: { type: String, default: "One-time" },
 
   // 🔹 Link recipients directly

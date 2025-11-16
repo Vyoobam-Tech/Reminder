@@ -227,8 +227,8 @@ import { SlBell } from "react-icons/sl";
                   <TableCell>{r.title}</TableCell>
                   <TableCell>{r.type}</TableCell>
                   <TableCell>{r.notes}</TableCell>
-                  <TableCell>{new Date(r.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</TableCell>
-                  <TableCell>{r.recurrence}</TableCell>
+                  <TableCell>{r.date.replace("T", " ").slice(0, 16)}</TableCell>
+                  <TableCell>{new Date(r.date).toLocaleString()}</TableCell>
                   {/* <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell> */}
                   <TableCell>
                     <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25} /></Button>
