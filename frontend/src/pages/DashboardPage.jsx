@@ -177,7 +177,7 @@ const DashboardPage = () => {
                 <ListItem>
                   <ListItemText
                     primary={`${r.title} - ${r.type || 'N/A'} - ${r.notes || 'No note'}`}
-                    secondary={new Date(r.date).toLocaleString()}
+                    secondary={r.date.replace("T", " ").slice(0, 16)}
                   />
                 </ListItem>
                 {i !== recentReminders.length - 1 && <Divider />}
