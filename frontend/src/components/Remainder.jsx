@@ -227,7 +227,7 @@ import { SlBell } from "react-icons/sl";
                   <TableCell>{r.title}</TableCell>
                   <TableCell>{r.type}</TableCell>
                   <TableCell>{r.notes}</TableCell>
-                  <TableCell>{r.date.replace("T", " ").slice(0, 16)}</TableCell>
+                  <TableCell>{r.date ? r.date.replace("T", " ").slice(0, 16) : '-'}</TableCell>
                   <TableCell>{r.recurrence}</TableCell>
                   {/* <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell> */}
                   <TableCell>

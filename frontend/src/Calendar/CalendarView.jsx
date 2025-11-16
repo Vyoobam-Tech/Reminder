@@ -14,12 +14,16 @@ import API from '../api/axiosInstance';
 
 export default function CalendarView() {
   const [events, setEvents] = useState([]);
-  const [form, setForm] = useState({ title: '', date: '', _id: null });
-  const [open, setOpen] = useState(false);
+  // const [form, setForm] = useState({ title: '', date: '', _id: null });
+  // const [open, setOpen] = useState(false);
 
   const fetchEvents = async () => {
-    const res = await API.get('/api/reminders/calendar');
-    setEvents(res.data);
+    try {
+      const res = await API.get("/api/reminders/calendar");
+      setEvents(res.data);
+    } catch (err) {
+      console.error("Calendar load error:", err);
+    }
   };
 
   useEffect(() => {
@@ -31,41 +35,41 @@ export default function CalendarView() {
     setOpen(true);
   };
 
-  const handleEventClick = (arg) => {
-    const event = events.find(e => e.id === arg.event.id);
-    if (event) {
-      setForm({
-        title: event.title,
-        date: new Date(event.start).toISOString().slice(0, 16),
-        _id: event.id
-      });
-      setOpen(true);
-    }
-  };
+  // const handleEventClick = (arg) => {
+  //   const event = events.find(e => e.id === arg.event.id);
+  //   if (event) {
+  //     setForm({
+  //       title: event.title,
+  //       date: new Date(event.start).toISOString().slice(0, 16),
+  //       _id: event.id
+  //     });
+  //     setOpen(true);
+  //   }
+  // };
 
-  const handleSave = async () => {
-    try {
-      if (form._id) {
-        await API.put(`/api/reminders/${form._id}`, form);
-      } else {
-        await API.post("/api/reminders", form);
-      }
-      setOpen(false);
-      fetchEvents();
-    } catch (err) {
-      alert('Save failed');
-    }
-  };
+  // const handleSave = async () => {
+  //   try {
+  //     if (form._id) {
+  //       await API.put(`/api/reminders/${form._id}`, form);
+  //     } else {
+  //       await API.post("/api/reminders", form);
+  //     }
+  //     setOpen(false);
+  //     fetchEvents();
+  //   } catch (err) {
+  //     alert('Save failed');
+  //   }
+  // };
 
-  const handleDelete = async () => {
-    try {
-      await API.delete(`/api/reminders/${form._id}`);
-      setOpen(false);
-      fetchEvents();
-    } catch (err) {
-      alert('Delete failed');
-    }
-  };
+  // const handleDelete = async () => {
+  //   try {
+  //     await API.delete(`/api/reminders/${form._id}`);
+  //     setOpen(false);
+  //     fetchEvents();
+  //   } catch (err) {
+  //     alert('Delete failed');
+  //   }
+  // };
 
   return (
     <Card elevation={3} sx={{ borderRadius: 3, p: 2 }}>
@@ -85,14 +89,14 @@ export default function CalendarView() {
             }}
             events={events}
             dateClick={handleDateClick}
-            eventClick={handleEventClick}
+            // eventClick={handleEventClick}
             editable={false}
           />
         </Box>
       </CardContent>
 
       {/* Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
+      {/* <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>{form._id ? 'Edit Reminder' : 'New Reminder'}</DialogTitle>
         <DialogContent>
           <TextField
@@ -121,7 +125,7 @@ export default function CalendarView() {
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleSave} variant="contained">Save</Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </Card>
   );
 }

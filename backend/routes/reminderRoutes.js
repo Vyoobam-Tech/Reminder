@@ -179,16 +179,30 @@ router.delete("/:id", async (req, res) => {
 router.get("/calendar", async (req, res) => {
   try {
     const reminders = await Reminder.find();
-    const events = reminders.map((r) => ({
-      id: r._id.toString(),
-      title: r.title,
-      start: r.date.toISOString(),
-    }));
+
+    const events = reminders.map((r) => {
+      let startDate;
+
+      try {
+        startDate = new Date(r.date).toISOString(); // convert safely
+      } catch {
+        startDate = null;
+      }
+
+      return {
+        id: r._id.toString(),
+        title: r.title,
+        start: startDate,
+      };
+    });
+
     res.json(events);
   } catch (err) {
+    console.error("Calendar fetch error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Send reminder email and whatsapp manually
 
