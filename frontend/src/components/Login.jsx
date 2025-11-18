@@ -1,13 +1,16 @@
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, colors, IconButton, InputAdornment, Paper, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
+    const [showPassword, setShowPassword] = useState(false)
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -112,17 +115,42 @@ const Login = () => {
           <TextField
             label="Password"
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={handleChange}
-            autoComplete="current-password"
             fullWidth
             required
             margin="normal"
             error={!!errors.password}
             helperText={errors.password}
+            autoComplete="new-password"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
+
+          <Link
+            to="/forgot-password"
+            style={{
+              display: "flex",
+              justifyContent: "end",
+              textDecoration: "none",
+              color: "#1976D2",
+            }}
+          >
+            Forgot Password?
+          </Link>
 
           <Button
             type="submit"

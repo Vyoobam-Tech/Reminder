@@ -14,13 +14,19 @@ import Task from './Task/TaskManager';
 import GroupPage from './pages/GroupPage';
 import Employee from './components/Employee';
 import SignupPage from './pages/SignupPage';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 const App = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const hideRoutes = ["/","/signup"];
-  const showTopbar = !hideRoutes.includes(location.pathname);
-  const showSidebar = !hideRoutes.includes(location.pathname);
+  const hideRoutes = ["/","/signup","/forgot-password"];
+  const hideRoutesWithParams = ["/reset-password/"]
+
+  const showTopbar = !hideRoutes.includes(location.pathname)&&
+  !hideRoutesWithParams.some(path => location.pathname.startsWith(path))
+  const showSidebar = !hideRoutes.includes(location.pathname)&&
+  !hideRoutesWithParams.some(path => location.pathname.startsWith(path))
   const [darkMode, setDarkMode] = useState(false)
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
@@ -53,6 +59,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path='/signup' element={<SignupPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/customer" element={<Customer />} />
             <Route path="/employee" element={<Employee />} />

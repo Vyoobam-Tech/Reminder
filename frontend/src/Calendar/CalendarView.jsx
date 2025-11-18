@@ -29,7 +29,7 @@ export default function CalendarView() {
 
         return {
           ...event,
-          start: corrected, // now calendar shows correct local time
+          start: event.start, // now calendar shows correct local time
         };
       });
 
@@ -105,6 +105,11 @@ export default function CalendarView() {
             // dateClick={handleDateClick}
             // eventClick={handleEventClick}
             editable={false}
+            eventTimeFormat={{
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,     // Forces AM/PM
+          }}
           />
         </Box>
       </CardContent>

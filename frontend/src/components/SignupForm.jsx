@@ -4,15 +4,18 @@ import {
   Button,
   Paper,
   Typography,
-  Box
+  Box,
+  IconButton,
+  InputAdornment
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 
 
 const SignupForm = () => {
-  // const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -21,11 +24,12 @@ const SignupForm = () => {
     confirmPassword: ""
   });
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL
-
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -53,10 +57,14 @@ const SignupForm = () => {
       valid = false;
     }
 
-    if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters.";
+    const passwordRegex =/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        "Password must be at least 8 characters and include letters, numbers, and special characters."
       valid = false;
     }
+
 
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match.";
@@ -198,13 +206,16 @@ const SignupForm = () => {
               margin="normal"
               error={!!errors.phone}
               helperText={errors.phone}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">+91</InputAdornment>,
+              }}
             />
           
 
           <TextField
             label="Password"
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={handleChange}
             autoComplete="current-password"
@@ -213,13 +224,25 @@ const SignupForm = () => {
             margin="normal"
             error={!!errors.password}
             helperText={errors.password}
+            InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  // edge="end"
+                >
+                  {showPassword ? <Visibility/> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
           />
 
           
             <TextField
               label="Confirm Password"
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={handleChange}
               fullWidth
@@ -227,7 +250,19 @@ const SignupForm = () => {
               margin="normal"
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
-               autoComplete="new-password"
+              autoComplete="new-password"
+              InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
             />
         
 

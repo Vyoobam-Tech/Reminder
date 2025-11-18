@@ -73,7 +73,12 @@ import { SlBell } from "react-icons/sl";
           ...reminder,
           image: reminder.image || null,
           video: reminder.video || null,
-          date: reminder.date?.slice(0, 16) || '',
+date: reminder.date
+  ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16)
+  : "",
+
           deliveryMethods: reminder.deliveryMethods || [],
           email: reminder.email || '',
           phone: reminder.phone || '',
@@ -122,7 +127,10 @@ import { SlBell } from "react-icons/sl";
         data.append("title", formData.title);
         data.append("type", formData.type);
         data.append("notes", formData.notes);
+        // Fix timezone issue
         data.append("date", formData.date);
+
+
         data.append("recurrence", formData.recurrence);
         data.append("email", formData.email);
         data.append("phone", formData.phone);
@@ -227,9 +235,10 @@ import { SlBell } from "react-icons/sl";
                   <TableCell>{r.title}</TableCell>
                   <TableCell>{r.type}</TableCell>
                   <TableCell>{r.notes}</TableCell>
-                  <TableCell>{r.date ? r.date.replace("T", " ").slice(0, 16) : '-'}</TableCell>
+                  <TableCell>
+                    {new Date(r.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+                  </TableCell>
                   <TableCell>{r.recurrence}</TableCell>
-                  {/* <TableCell>{(r.deliveryMethods || []).join(', ')}</TableCell> */}
                   <TableCell>
                     <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25} /></Button>
                     <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25} /></Button>
