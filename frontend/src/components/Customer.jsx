@@ -242,9 +242,14 @@ export default function Customer() {
 
     if (!newCustomer.name) newErrors.name = 'Name is required'
     if (!newCustomer.email) newErrors.email = 'Email is required'
-    if (!newCustomer.phone) newErrors.phone = 'Phone is required'
+    if (!newCustomer.phone) {
+    newErrors.phone = "Phone is required";
+    }
+    else if (!/^\d{10}$/.test(newCustomer.phone)) {
+    newErrors.phone = "Phone must be exactly 10 digits";
+    }
     if (newCustomer.preferredDelivery.length === 0 ){
-     newErrors.preferredDelivery = 'Preferred Delivery is required'
+    newErrors.preferredDelivery = 'Preferred Delivery is required'
     }
     if (Object.keys(newErrors).length > 0) {
       setError(newErrors)
@@ -447,7 +452,7 @@ export default function Customer() {
               margin="dense"
               value={newCustomer.phone}
               onChange={handleNewCustomerChange}
-              error={!newCustomer.phone}
+              error={!!newCustomer.phone}
               helperText={error.phone}
             />
             <TextField

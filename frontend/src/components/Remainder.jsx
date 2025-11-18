@@ -73,12 +73,9 @@ import { SlBell } from "react-icons/sl";
           ...reminder,
           image: reminder.image || null,
           video: reminder.video || null,
-date: reminder.date
-  ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16)
-  : "",
-
+          date: reminder.date
+            ? new Date(reminder.date).toISOString().slice(0, 16)
+            : "",
           deliveryMethods: reminder.deliveryMethods || [],
           email: reminder.email || '',
           phone: reminder.phone || '',
@@ -128,9 +125,8 @@ date: reminder.date
         data.append("type", formData.type);
         data.append("notes", formData.notes);
         // Fix timezone issue
-        data.append("date", formData.date);
-
-
+        const utcDate = new Date(formData.date).toISOString();
+        data.append("date", utcDate);
         data.append("recurrence", formData.recurrence);
         data.append("email", formData.email);
         data.append("phone", formData.phone);
