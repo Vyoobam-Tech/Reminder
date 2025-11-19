@@ -15,7 +15,6 @@ import taskRoutes from './routes/taskRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import path from 'path'
 
-
 dotenv.config();
 const app = express();
 
@@ -42,6 +41,12 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/groups', groupRoutes);
 
 
+const __dirname1 = path.resolve();
+app.use(express.static(path.join(__dirname1, "/frontend/dist"))); // <-- adjust if folder name is different
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname1, "/frontend/dist/index.html"));
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

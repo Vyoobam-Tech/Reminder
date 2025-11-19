@@ -328,29 +328,47 @@ import { SlBell } from "react-icons/sl";
                   </MenuItem>
                 ))} */}
                 <Autocomplete
-                  multiple
-                  options={customerOptions}
-                  getOptionLabel={(option) => option.name}
-                  value={customerOptions.filter(c => selectedRecipients.includes(c._id))}
-                  onChange={(e, value) => setSelectedRecipients(value.map(v => v._id))}
-                  disableCloseOnSelect
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox checked={selected} style={{ marginRight: 8 }} />
-                      {option.name}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Select Customer"
-                      placeholder="Type to search..."
-                      margin="dense"
-                      fullWidth
+                multiple
+                options={customerOptions}
+                getOptionLabel={(option) => option.name}
+                value={customerOptions.filter((c) => selectedRecipients.includes(c._id))}
+                onChange={(e, value) => setSelectedRecipients(value.map((v) => v._id))}
+                disableCloseOnSelect
+                renderOption={(props, option, { selected }) => (
+                  <li {...props}>
+                    <Checkbox
+                      checked={selected}
+                      style={{ marginRight: 8 }}
                     />
-                  )}
-                  filterSelectedOptions
-                />
+                    {option.name}
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Customer"
+                    placeholder="Type to search..."
+                    margin="dense"
+                    fullWidth
+                  />
+                )}
+                renderTags={(selected, getTagProps) =>
+                  selected.map((option) => (
+                    <span
+                      key={option._id}
+                      style={{
+                        padding: "2px 6px",
+                        margin: 2,
+                        background: "#e0e0e0",
+                        borderRadius: 4,
+                        display: "inline-flex"
+                      }}
+                    >
+                      {option.name}
+                    </span>
+                  ))
+                }
+              />
               </TextField>
             )}
 
@@ -400,7 +418,22 @@ import { SlBell } from "react-icons/sl";
                       fullWidth
                     />
                   )}
-                  filterSelectedOptions
+                  renderTags={(selected, getTagProps) =>
+                  selected.map((option) => (
+                    <span
+                      key={option._id}
+                      style={{
+                        padding: "2px 6px",
+                        margin: 2,
+                        background: "#e0e0e0",
+                        borderRadius: 4,
+                        display: "inline-flex"
+                      }}
+                    >
+                      {option.name}
+                    </span>
+                  ))
+                }
                 />
               </TextField>
             )}
