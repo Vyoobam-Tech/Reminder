@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
+import logo from "../assests/vyoobamnudge.png";
 
 const Topbar = ({ onMenuClick }) => {
   const handleLogout = () => {
@@ -24,7 +25,7 @@ const Topbar = ({ onMenuClick }) => {
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
         background:
-          "#FF6767",
+          "#00052b",
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
@@ -39,7 +40,8 @@ const Topbar = ({ onMenuClick }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography
+          <img src={logo}  style={{ height: 75, width: "auto", marginLeft: 8 }}/>
+          {/* <Typography
             variant="h6"
             sx={{
               fontWeight: 600,
@@ -47,7 +49,7 @@ const Topbar = ({ onMenuClick }) => {
             }}
           >
             Vyoobam Reminder
-          </Typography>
+          </Typography> */}
         </Box>
 
         {/* Right: Logout Icon (always shown) */}

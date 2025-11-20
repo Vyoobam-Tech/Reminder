@@ -6,6 +6,7 @@ import {
   DialogTitle, DialogContent, DialogActions, IconButton, Checkbox
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { FaUserGroup } from "react-icons/fa6";
 
 function GroupManager() {
   const [customers, setCustomers] = useState([]);
@@ -71,8 +72,10 @@ function GroupManager() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>Group Manager</Typography>
+    <Container sx={{ mt: 4 }}>
+      <Typography variant="h4" fontWeight={600} gutterBottom>
+        <FaUserGroup /> Group Manager
+      </Typography>
 
       {/* Create Group */}
       <Paper sx={{ p: 2, mt: 2 }}>
@@ -120,7 +123,7 @@ function GroupManager() {
 
       {/* Group List */}
       <Paper sx={{ mt: 4, p: 2 }}>
-        <Typography variant="h6">Existing Groups</Typography>
+        <Typography variant="h6" fontWeight="bold">Existing Groups</Typography>
         <ul>
           {groups.map(group => (
             <li key={group._id}>

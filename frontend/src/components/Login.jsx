@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Link, useNavigate } from 'react-router-dom';
+import logo from "../assests/logo1.png"
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -83,9 +84,10 @@ const Login = () => {
           padding: 5,
           width: 350,
           textAlign: "center",
-          borderRadius: 2
+          borderRadius: 2,
         }}
       >
+        <img src={logo} style={{ height: 75, width: "auto" }}/>
         <Typography variant="h5" fontWeight="bold" gutterBottom>
           Sign In
         </Typography>

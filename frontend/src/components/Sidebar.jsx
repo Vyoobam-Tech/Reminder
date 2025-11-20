@@ -72,7 +72,7 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                 transition: "all 0.3s",
               }}
             >
-              <ListItemIcon sx={{ color: "black", minWidth: 36 }}>
+              <ListItemIcon sx={{ color: "white", minWidth: 36 }}>
                 {item.icon}
               </ListItemIcon>
               <ListItemText
@@ -80,7 +80,7 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                 primaryTypographyProps={{
                   fontSize: 14,
                   fontWeight: 500,
-                  color:'black'
+                  color:'white'
                 }}
               />
             </ListItemButton>
@@ -101,7 +101,7 @@ const Sidebar = ({ mobileOpen, onClose }) => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             background:
-             "#FFF0CE",
+             "#0A123F",
             color: "#fff",
             boxSizing: "border-box",
             backdropFilter: "blur(12px)",

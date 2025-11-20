@@ -23,6 +23,8 @@ import MiniCalendar from '../Calendar/MiniCalendar';
 import FullOverlayCalendar from '../Calendar/FullOverlayCalendar';
 import { SlChart,  SlBell } from "react-icons/sl";
 import { useNavigate } from 'react-router-dom';
+import { MdRecentActors } from "react-icons/md";
+
 
 const DashboardPage = () => {
   const [stats, setStats] = useState({
@@ -167,8 +169,8 @@ const DashboardPage = () => {
 
       {/* Recent Reminders */}
       <Box mt={5}>
-        <Typography variant="h6" gutterBottom>
-          Recent General Reminders
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          <MdRecentActors /> Recent General Reminders
         </Typography>
         <Paper elevation={3} sx={{ p: 2}}>
           <List>

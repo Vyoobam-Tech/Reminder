@@ -6,9 +6,11 @@ import interactionPlugin from '@fullcalendar/interaction';
 import {
   Box, Typography, Card, CardContent,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField
+  Button, TextField,
+  Container
 } from '@mui/material';
 import API from '../api/axiosInstance';
+import { FaCalendarAlt } from "react-icons/fa";
 
 export default function CalendarView() {
   const [events, setEvents] = useState([]);
@@ -86,31 +88,42 @@ export default function CalendarView() {
   // };
 
   return (
-    <Card elevation={3} sx={{ borderRadius: 3, p: 2 }}>
-      <CardContent>
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
-          Customer Reminder Calendar
-        </Typography>
+
+    <Container>
+      <Typography variant="h4" fontWeight={600} gutterBottom>
+        <FaCalendarAlt /> Customer Reminder Calendar
+      </Typography>
+    <Card elevation={3} sx={{background: "#white",  borderRadius: 3, p: 2 }}>
+      <CardContent >
         <Box mt={2}>
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            height="80vh"
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay',
-            }}
-            events={events}
-            // dateClick={handleDateClick}
-            // eventClick={handleEventClick}
-            editable={false}
-            eventTimeFormat={{
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true,     // Forces AM/PM
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          height="80vh"
+          headerToolbar={{
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay',
           }}
-          />
+          events={events}
+
+          dayCellDidMount={(info) => {
+            const frame = info.el.querySelector(".fc-daygrid-day-frame");
+            if (frame) {
+              frame.style.backgroundColor = "#2c3e50";
+              frame.style.color = "white"
+            }
+          }}
+
+          editable={false}
+          eventTimeFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }}
+        />
+
+
         </Box>
       </CardContent>
 
@@ -146,5 +159,6 @@ export default function CalendarView() {
         </DialogActions>
       </Dialog> */}
     </Card>
+    </Container>
   );
 }

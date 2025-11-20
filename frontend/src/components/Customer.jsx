@@ -320,7 +320,7 @@ export default function Customer() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" fontWeight={600} gutterBottom>
           <TfiClipboard /> Customer Management
         </Typography>
 

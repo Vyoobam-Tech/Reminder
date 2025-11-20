@@ -41,12 +41,13 @@ router.get('/export', async (req, res) => {
   }
 
   else if (type === 'pdf') {
-    const doc = new PDFDocument();
-    const filePath = path.join('temp', 'customers.pdf');
-    const writeStream = fs.createWriteStream(filePath);
-    doc.pipe(writeStream);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=customers.pdf");
 
-    doc.fontSize(18).text('Customer Report', { align: 'center' });
+    const doc = new PDFDocument();
+    doc.pipe(res);
+
+    doc.fontSize(18).text("Customer Report", { align: "center" });
     doc.moveDown();
 
     customers.forEach(c => {
@@ -60,10 +61,6 @@ router.get('/export', async (req, res) => {
     });
 
     doc.end();
-
-    writeStream.on('finish', () => {
-      res.download(filePath, 'customers.pdf', () => fs.unlinkSync(filePath));
-    });
   }
 
   else {

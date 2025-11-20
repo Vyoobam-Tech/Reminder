@@ -209,7 +209,7 @@ import { SlBell } from "react-icons/sl";
 
     return (
       <Container sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom><SlBell /> Reminder Management</Typography>
+        <Typography variant="h4" fontWeight={600} gutterBottom><SlBell /> Reminder Management</Typography>
         <Box mb={2}><Button variant="contained" onClick={() => handleOpen()}>+ Add Reminder</Button></Box>
 
         <Paper>

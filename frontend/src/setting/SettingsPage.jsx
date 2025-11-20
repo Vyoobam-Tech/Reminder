@@ -12,6 +12,7 @@ import {
   FormControlLabel, 
   Stack,
   Avatar,
+  Container,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
@@ -46,8 +47,8 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
   const handleTabChange = (_, newValue) => setTabIndex(newValue);
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Container sx={{ mt: 4 }}>
+      <Typography variant="h4" fontWeight={600} gutterBottom>
         <IoSettingsSharp /> App Settings
       </Typography>
 
@@ -74,7 +75,7 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
                 <Avatar sx={{ width: 60, height: 60 }}>
                   {user ? user.username[0] : "U"}
                 </Avatar>
-                <Typography variant="h6">
+                <Typography variant="h6" fontWeight={600}>
                   {user ? user.username : "Loading..."}
                 </Typography>
               </Box>
@@ -120,7 +121,7 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
           {/* ABOUT TAB */}
           {tabIndex === 2 && (
             <Box sx={{ m:2, p:3}}>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" fontWeight={600} gutterBottom>
                 <SlCalender /> Reminder App Features
               </Typography>
               <ul>
@@ -147,7 +148,7 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
           )}
         </CardContent>
       </Card>
-    </Box>
+    </Container>
   );
 };
 
