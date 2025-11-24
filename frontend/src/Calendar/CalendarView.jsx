@@ -7,15 +7,17 @@ import {
   Box, Typography, Card, CardContent,
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField,
-  Container
+  Container,
+  IconButton
 } from '@mui/material';
 import API from '../api/axiosInstance';
-import { FaCalendarAlt } from "react-icons/fa";
+import CloseIcon from "@mui/icons-material/Close";
+
 
 export default function CalendarView() {
   const [events, setEvents] = useState([]);
-  // const [form, setForm] = useState({ title: '', date: '', _id: null });
-  // const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ title: '', type: '', notes: '', date: '', _id: null });
+  const [open, setOpen] = useState(false);
 
   const fetchEvents = async () => {
     try {
@@ -46,52 +48,66 @@ export default function CalendarView() {
     fetchEvents();
   }, []);
 
-  // const handleDateClick = (arg) => {
-  //   setForm({ title: '', date: arg.dateStr + 'T09:00', _id: null });
-  //   setOpen(true);
-  // };
+  const handleDateClick = (arg) => {
+    setForm({
+      title: '',
+      type: '',
+      notes: '',
+      date: arg.dateStr + 'T09:00',
+      _id: null
+    });
+    setOpen(true);
+  };
 
-  // const handleEventClick = (arg) => {
-  //   const event = events.find(e => e.id === arg.event.id);
-  //   if (event) {
-  //     setForm({
-  //       title: event.title,
-  //       date: new Date(event.start).toISOString().slice(0, 16),
-  //       _id: event.id
-  //     });
-  //     setOpen(true);
-  //   }
-  // };
 
-  // const handleSave = async () => {
-  //   try {
-  //     if (form._id) {
-  //       await API.put(`/api/reminders/${form._id}`, form);
-  //     } else {
-  //       await API.post("/api/reminders", form);
-  //     }
-  //     setOpen(false);
-  //     fetchEvents();
-  //   } catch (err) {
-  //     alert('Save failed');
-  //   }
-  // };
+  const handleEventClick = (arg) => {
+    const event = events.find(e => e.id === arg.event.id);
+    if (event) {
+      const ist = new Date(event.start).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata"
+      });
 
-  // const handleDelete = async () => {
-  //   try {
-  //     await API.delete(`/api/reminders/${form._id}`);
-  //     setOpen(false);
-  //     fetchEvents();
-  //   } catch (err) {
-  //     alert('Delete failed');
-  //   }
-  // };
+      setForm({
+        title: event.title,
+        type: event.type,
+        notes: event.notes,
+        date: ist,
+        _id: event.id
+      });
+      setOpen(true);
+    }
+  };
+
+
+  const handleSave = async () => {
+    try {
+      if (form._id) {
+        await API.put(`/api/reminders/${form._id}`, form);
+      } else {
+        await API.post("/api/reminders", form);
+      }
+      setOpen(false);
+      fetchEvents();
+    } catch (err) {
+      alert('Save failed');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await API.delete(`/api/reminders/${form._id}`);
+      setOpen(false);
+      fetchEvents();
+    } catch (err) {
+      alert('Delete failed');
+    }
+  };
 
   return (
 
     <Container>
-      <Typography variant="h4" fontWeight={600} gutterBottom>
-        <FaCalendarAlt /> Customer Reminder Calendar
+      <Typography variant="h4" gutterBottom>
+        Customer Reminder Calendar
       </Typography>
     <Card elevation={3} sx={{background: "#white",  borderRadius: 3, p: 2 }}>
       <CardContent >
@@ -106,6 +122,8 @@ export default function CalendarView() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay',
           }}
           events={events}
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
 
           dayCellDidMount={(info) => {
             const frame = info.el.querySelector(".fc-daygrid-day-frame");
@@ -122,14 +140,12 @@ export default function CalendarView() {
             hour12: true,
           }}
         />
-
-
         </Box>
       </CardContent>
 
       {/* Dialog */}
-      {/* <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{form._id ? 'Edit Reminder' : 'New Reminder'}</DialogTitle>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogTitle sx={{ color: 'white', bgcolor: '#1976D2', display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>Reminder Details<IconButton onClick={() => setOpen(false)} color="dark"> <CloseIcon sx={{ color: "white" }} /> </IconButton> </DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -137,18 +153,37 @@ export default function CalendarView() {
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             sx={{ mt: 1 }}
+            disabled
           />
           <TextField
             fullWidth
-            type="datetime-local"
+            label="Type"
+            value={form.type}
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+            sx={{ mt: 1 }}
+            disabled
+          />
+
+          <TextField
+            fullWidth
+            label="Notes"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            sx={{ mt: 1 }}
+            disabled
+          />
+          <TextField
+            fullWidth
+            type="text"
             label="Date & Time"
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
             sx={{ mt: 2 }}
+            disabled
             InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
-        <DialogActions>
+        {/* <DialogActions>
           {form._id && (
             <Button color="error" onClick={handleDelete}>
               Delete
@@ -156,8 +191,8 @@ export default function CalendarView() {
           )}
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleSave} variant="contained">Save</Button>
-        </DialogActions>
-      </Dialog> */}
+        </DialogActions> */}
+      </Dialog>
     </Card>
     </Container>
   );

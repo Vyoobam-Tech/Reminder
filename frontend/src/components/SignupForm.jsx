@@ -86,13 +86,6 @@ const SignupForm = () => {
         withCredentials: true // send cookies
       });
 
-      alert(
-        response.data.message ||
-          "Signup Successful!"
-      );
-
-
-
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -126,7 +119,6 @@ const SignupForm = () => {
         { withCredentials: true }
       );
 
-      alert(response.data.message || "Google Login Successful!");
       navigate("/dashboard");
     } catch (error) {
       alert(error.response?.data?.message || "Google login failed");

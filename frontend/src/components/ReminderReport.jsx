@@ -1,8 +1,5 @@
-// components/ReportPanel.jsx
-// import axios from 'axios';
 import API from '../api/axiosInstance';
 import { Box, Button ,Container,Stack,Typography} from '@mui/material';
-import { TbReportSearch } from "react-icons/tb";
 
 export default function ReportPanel() {
   const exportCustomers = async (type) => {
@@ -29,8 +26,8 @@ export default function ReportPanel() {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" fontWeight={600} gutterBottom>
-        <TbReportSearch /> Reminder Reports
+      <Typography variant="h4" gutterBottom>
+        Reminder Reports
       </Typography>
 
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>

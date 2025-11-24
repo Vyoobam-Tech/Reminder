@@ -17,13 +17,7 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { IoSettingsSharp } from "react-icons/io5";
-// import axios from "axios";
 import API from "../api/axiosInstance";
-import { SlChart, SlBell, SlCalender } from "react-icons/sl";
-import { MdTask } from "react-icons/md";
-import { LuMessageCircleMore } from "react-icons/lu";
-import { GiBrain } from "react-icons/gi";
 
 const SettingsPage = ({ darkMode, setDarkMode }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -48,8 +42,8 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" fontWeight={600} gutterBottom>
-        <IoSettingsSharp /> App Settings
+      <Typography variant="h4" gutterBottom>
+        App Settings
       </Typography>
 
       <Card sx={{ mt: 2, borderRadius: 3 }}>
@@ -122,26 +116,26 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
           {tabIndex === 2 && (
             <Box sx={{ m:2, p:3}}>
               <Typography variant="h6" fontWeight={600} gutterBottom>
-                <SlCalender /> Reminder App Features
+                Reminder App Features
               </Typography>
               <ul>
                 <li>
-                  <SlBell /> Smart Reminders & Alerts
+                  Smart Reminders & Alerts
                 </li>
                 <li>
-                  <SlCalender /> Integrated Calendar View
+                  Integrated Calendar View
                 </li>
                 <li>
-                  <MdTask /> Task & Customer Management
+                  Task & Customer Management
                 </li>
                 <li>
-                  <SlChart /> Dashboard Analytics
+                  Dashboard Analytics
                 </li>
                 <li>
-                  <LuMessageCircleMore /> Email/SMS Integrations
+                  Email/SMS Integrations
                 </li>
                 <li>
-                  <GiBrain /> AI-Powered Follow-ups (coming soon)
+                  AI-Powered Follow-ups (coming soon)
                 </li>
               </ul>
             </Box>

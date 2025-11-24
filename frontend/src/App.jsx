@@ -16,6 +16,7 @@ import Employee from './components/Employee';
 import SignupPage from './pages/SignupPage';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import Footer from './components/Footer';
 
 const App = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -27,6 +28,8 @@ const App = () => {
   !hideRoutesWithParams.some(path => location.pathname.startsWith(path))
   const showSidebar = !hideRoutes.includes(location.pathname)&&
   !hideRoutesWithParams.some(path => location.pathname.startsWith(path))
+  const showFooter = !hideRoutes.includes(location.pathname)&&
+  !hideRoutesWithParams.some(path=> location.pathname.startsWith(path))
   const [darkMode, setDarkMode] = useState(false)
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
@@ -71,6 +74,7 @@ const App = () => {
             <Route path="/task" element={<Task />} />
             <Route path="/group" element={<GroupPage />} />
           </Routes>
+          {/* {showFooter && <Footer />} */}
         </Box>
       </Box>
     </ThemeProvider>

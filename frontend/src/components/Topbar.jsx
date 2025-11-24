@@ -25,7 +25,7 @@ const Topbar = ({ onMenuClick }) => {
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
         background:
-          "#00052b",
+          "#1976d2",
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
@@ -40,7 +40,7 @@ const Topbar = ({ onMenuClick }) => {
           >
             <MenuIcon />
           </IconButton>
-          <img src={logo}  style={{ height: 75, width: "auto", marginLeft: 8 }}/>
+          <img src={logo}  style={{ height: 75, width: "auto", marginLeft: 28 }}/>
           {/* <Typography
             variant="h6"
             sx={{

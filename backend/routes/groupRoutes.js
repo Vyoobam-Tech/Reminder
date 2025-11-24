@@ -11,6 +11,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { name, members } = req.body;
+
+  const existingGroup = await Group.findOne({ name })
+  if(existingGroup){
+    return res.status(400).json({message: "Group Name already exists"})
+  }
+
   const group = new Group({ name, members });
   await group.save();
   res.status(201).json(group);

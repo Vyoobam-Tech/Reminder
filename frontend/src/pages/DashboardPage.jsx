@@ -19,11 +19,8 @@ import {
 } from '@mui/icons-material';
 // import axios from 'axios';
 import API from '../api/axiosInstance';
-import MiniCalendar from '../Calendar/MiniCalendar';
 import FullOverlayCalendar from '../Calendar/FullOverlayCalendar';
-import { SlChart,  SlBell } from "react-icons/sl";
 import { useNavigate } from 'react-router-dom';
-import { MdRecentActors } from "react-icons/md";
 
 
 const DashboardPage = () => {
@@ -142,8 +139,8 @@ const DashboardPage = () => {
     <Box sx={{ p: { xs: 2, md: 4 } }}>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>
-          <SlChart size={50}/> Dashboard Analytics
+        <Typography variant="h4">
+          Dashboard Analytics
         </Typography>
         {/* <MiniCalendar onOpenFull={() => setShowCalendar(true)} /> */}
       </Box>
@@ -169,8 +166,8 @@ const DashboardPage = () => {
 
       {/* Recent Reminders */}
       <Box mt={5}>
-        <Typography variant="h5" fontWeight={600} gutterBottom>
-          <MdRecentActors /> Recent General Reminders
+        <Typography variant="h4" gutterBottom>
+          Recent General Reminders
         </Typography>
         <Paper elevation={3} sx={{ p: 2}}>
           <List>

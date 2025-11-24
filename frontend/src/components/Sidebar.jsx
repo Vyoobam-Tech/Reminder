@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Drawer,
@@ -6,8 +6,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  IconButton,
   useMediaQuery,
-  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -16,35 +16,43 @@ import {
   ListAlt,
   Group,
   Summarize,
-  Task,
   CalendarMonth,
   Settings,
 } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ImManWoman } from "react-icons/im";
+import MenuIcon from "@mui/icons-material/Menu";
 
-const drawerWidth = 190;
+const expandedWidth = 190;
+const collapsedWidth = 70;
 
 const navItems = [
   { icon: <Dashboard />, label: "Dashboard", path: "/dashboard" },
   { icon: <EditNotifications />, label: "Reminder", path: "/reminder" },
   { icon: <ListAlt />, label: "Customer", path: "/customer" },
-  // { icon: <ImManWoman />, label: "Employee", path: "/employee" },
   { icon: <Group />, label: "Group", path: "/group" },
   { icon: <Summarize />, label: "Reports", path: "/reminderReport" },
-  // { icon: <Task />, label: "Task", path: "/task" },
   { icon: <CalendarMonth />, label: "Calendar", path: "/calendar" },
   { icon: <Settings />, label: "Settings", path: "/settings" },
 ];
 
 const Sidebar = ({ mobileOpen, onClose }) => {
+  const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const toggleSidebar = () => setCollapsed(!collapsed);
+
   const drawer = (
-    <Box sx={{ px: 1, pt: 10 }}>
+    <Box sx={{ px: 1, pt: 8 }}>
+      {/* Menu Toggle Button */}
+      <Box sx={{ width: "100%", display: "flex", px: collapsed ? 1 : 2, mb: 2 }}>
+        <IconButton sx={{ color: "white" }} onClick={toggleSidebar}>
+          <MenuIcon />
+        </IconButton>
+      </Box>
+
       <List>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -54,35 +62,46 @@ const Sidebar = ({ mobileOpen, onClose }) => {
               key={item.label}
               onClick={() => {
                 navigate(item.path);
-                if (isMobile) onClose(); // Auto-close on mobile
+                if (isMobile) onClose();
               }}
               sx={{
                 mb: 1,
-                px: 2,
+                px: collapsed ? 1 : 2,
                 py: 1,
                 borderRadius: "8px",
                 backgroundColor: isActive
                   ? "rgba(255,255,255,0.15)"
                   : "transparent",
                 color: "white",
+                justifyContent: collapsed ? "center" : "flex-start",
+                transition: "all 0.3s",
                 "&:hover": {
                   backgroundColor: "rgba(255,255,255,0.25)",
                   transform: "scale(1.03)",
                 },
-                transition: "all 0.3s",
               }}
             >
-              <ListItemIcon sx={{ color: "white", minWidth: 36 }}>
+              <ListItemIcon
+                sx={{
+                  color: "white",
+                  minWidth: 0,
+                  mr: collapsed ? 0 : 2,
+                  justifyContent: "center",
+                }}
+              >
                 {item.icon}
               </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color:'white'
-                }}
-              />
+
+              {!collapsed && (
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: "white",
+                  }}
+                />
+              )}
             </ListItemButton>
           );
         })}
@@ -99,13 +118,11 @@ const Sidebar = ({ mobileOpen, onClose }) => {
         ModalProps={{ keepMounted: true }}
         sx={{
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            background:
-             "#0A123F",
+            width: collapsed ? collapsedWidth : expandedWidth,
+            transition: "width 0.3s ease",
+            overflowX: "hidden",
+            background: "#1976d2",
             color: "#fff",
-            boxSizing: "border-box",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
           },
         }}
       >

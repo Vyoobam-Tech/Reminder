@@ -53,11 +53,6 @@ const Login = () => {
         withCredentials: true // send cookies
       });
 
-    alert(
-        response.data.message ||
-          "Login Successful!"
-      );
-
       navigate("/dashboard");
     } catch (error) {
       setErrors({

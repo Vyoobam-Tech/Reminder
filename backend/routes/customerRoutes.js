@@ -47,9 +47,15 @@ router.post('/', async (req, res) => {
   try {
     const { name, email, phone, purchaseDate, reminderDate, note, address, dob, preferredDelivery,} = req.body;
 
-    // if (!name || !email || !phone) {
-    //   return res.status(400).json({ message: 'Name, email, and phone are required' });
-    // }
+    const existingEmail = await Customer.findOne({ email })
+    if(existingEmail) {
+      return res.status(400).json({message: "Email already exists"})
+    }
+
+    const existingPhone = await Customer.findOne({ phone })
+    if(existingPhone) {
+      return res.status(400).json({message: "Phone Number already exists"})
+    }
 
     const customer = new Customer({
       name,
@@ -86,31 +92,58 @@ router.get('/', async (req, res) => {
 // 4️⃣ Update
 router.put('/:id', async (req, res) => {
   try {
+    const customerId = req.params.id;
+    const { name, email, phone, note, address, preferredDelivery, purchaseDate, dob, reminderDate } = req.body;
+
     const updateData = {};
-    ['name', 'email', 'phone', 'note','address','preferredDelivery'].forEach(key => {
-      if (req.body[key] !== undefined) updateData[key] = req.body[key];
+
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (phone !== undefined) updateData.phone = phone;
+    if (note !== undefined) updateData.note = note;
+    if (address !== undefined) updateData.address = address;
+    if (preferredDelivery !== undefined) updateData.preferredDelivery = preferredDelivery;
+
+    // Validate unique email (ignore current customer)
+    if (email) {
+      const existingEmail = await Customer.findOne({
+        email,
+        _id: { $ne: customerId },
+      });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+    }
+
+    // Validate unique phone (ignore current customer)
+    if (phone) {
+      const existingPhone = await Customer.findOne({
+        phone,
+        _id: { $ne: customerId },
+      });
+      if (existingPhone) {
+        return res.status(400).json({ message: "Phone Number already exists" });
+      }
+    }
+
+    if (purchaseDate) updateData.purchaseDate = new Date(purchaseDate);
+    if (dob) updateData.dob = new Date(dob);
+    if (reminderDate !== undefined)
+      updateData.reminderDate = reminderDate ? new Date(reminderDate) : null;
+
+    const updated = await Customer.findByIdAndUpdate(customerId, updateData, {
+      new: true,
     });
 
-    if (req.body.purchaseDate)
-      updateData.purchaseDate = new Date(req.body.purchaseDate);
-
-     if (req.body.dob)
-      updateData.dob = new Date(req.body.dob);
-
-    if ('reminderDate' in req.body)
-      updateData.reminderDate = req.body.reminderDate ? new Date(req.body.reminderDate) : null;
-
-    const updated = await Customer.findByIdAndUpdate(req.params.id, updateData, { new: true });
-
-    if (!updated) return res.status(404).json({ message: 'Customer not found' });
-
-    if (updated.reminderDate) scheduleReminder(updated);
+    if (!updated) return res.status(404).json({ message: "Customer not found" });
 
     res.json(updated);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
+
 
 // 5️⃣ Delete
 router.delete('/:id', async (req, res) => {

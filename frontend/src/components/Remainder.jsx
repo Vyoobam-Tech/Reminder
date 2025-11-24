@@ -8,7 +8,8 @@ import {
     Grid
   } from '@mui/material';
 import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
-import { SlBell } from "react-icons/sl";
+import CloseIcon from "@mui/icons-material/Close";
+
 
   const reminderTypes = [
     'Meeting', 'Client Follow-up', 'Payment Due',
@@ -73,9 +74,12 @@ import { SlBell } from "react-icons/sl";
           ...reminder,
           image: reminder.image || null,
           video: reminder.video || null,
-          date: reminder.date
-            ? new Date(reminder.date).toISOString().slice(0, 16)
-            : "",
+         date: reminder.date
+  ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16)
+  : "",
+
           deliveryMethods: reminder.deliveryMethods || [],
           email: reminder.email || '',
           phone: reminder.phone || '',
@@ -172,10 +176,8 @@ import { SlBell } from "react-icons/sl";
     };
 
     const handleDelete = async (id) => {
-      if (window.confirm('Delete this reminder?')) {
         await API.delete(`/api/reminders/${id}`);
         fetchReminders();
-      }
     };
 
     const handleRecipientType = async(e) => {
@@ -203,26 +205,23 @@ import { SlBell } from "react-icons/sl";
     const handleSelectChange = (e) => {
       setSelectedRecipients(e.target.value);
     }
-    
-
-
 
     return (
       <Container sx={{ mt: 4 }}>
-        <Typography variant="h4" fontWeight={600} gutterBottom><SlBell /> Reminder Management</Typography>
+        <Typography variant="h4" gutterBottom> Reminder Management</Typography>
         <Box mb={2}><Button variant="contained" onClick={() => handleOpen()}>+ Add Reminder</Button></Box>
 
         <Paper>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Notes</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Recurrence</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Notes</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Recurrence</TableCell>
                 {/* <TableCell>Delivery</TableCell> */}
-                <TableCell>Actions</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -247,7 +246,7 @@ import { SlBell } from "react-icons/sl";
 
         {/* Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-          <DialogTitle>{editId ? 'Edit' : 'Create'} Reminder</DialogTitle>
+          <DialogTitle sx={{ color: 'white', bgcolor: '#1976D2', display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>{editId ? 'Edit' : 'Create'} Reminder<IconButton onClick={() => setDialogOpen(false)} color="dark"> <CloseIcon sx={{ color: "white" }} /> </IconButton> </DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
             

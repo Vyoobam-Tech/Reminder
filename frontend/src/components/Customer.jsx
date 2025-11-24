@@ -21,18 +21,17 @@ import {
   ListItemText,
   OutlinedInput,
   FormHelperText,
+  IconButton,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import * as XLSX from "xlsx";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { TfiClipboard } from "react-icons/tfi";
 import { DataGrid } from "@mui/x-data-grid";
 import i18n from "../i18n";
 import { useTranslation } from "react-i18next";
-
-
+import CloseIcon from "@mui/icons-material/Close";
 
 
 export default function Customer() {
@@ -158,7 +157,6 @@ export default function Customer() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this customer?")) return;
     try {
       await API.delete(`/api/customers/${id}`);
       fetchCustomers();
@@ -189,8 +187,8 @@ export default function Customer() {
       );
       setEditCustomer(null);
       fetchCustomers();
-    } catch {
-      alert("Failed to update");
+    } catch (err) {
+      setError({api:err.response?.data?.message || "Failed to Edit customer"});
     }
   };
 
@@ -273,7 +271,7 @@ export default function Customer() {
       });
       fetchCustomers();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to add customer");
+      setError({api:err.response?.data?.message || "Failed to add customer"});
     }
   };
 
@@ -320,8 +318,8 @@ export default function Customer() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" fontWeight={600} gutterBottom>
-          <TfiClipboard /> Customer Management
+        <Typography variant="h4" gutterBottom>
+          Customer Management
         </Typography>
 
         <Paper sx={{ p: 2, mb: 4 }}>
@@ -343,7 +341,6 @@ export default function Customer() {
             </Button> */}
             <Button
               variant="contained"
-              color="success"
               onClick={() => setNewCustomerDialog(true)}
             >
               Add Customer
@@ -404,10 +401,11 @@ export default function Customer() {
           open={newCustomerDialog}
           onClose={() => setNewCustomerDialog(false)}
         >
-          <DialogTitle>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography variant="h6">{t("addNewCustomer")}</Typography>
-                <FormControl size="small" sx={{ minWidth: 120 }}>
+          {/* <DialogTitle> */}
+            <DialogTitle sx={{ color: 'white', bgcolor: '#1976D2', display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>Add New Customer<IconButton onClick={() => setNewCustomerDialog(false)} color="dark"> <CloseIcon sx={{ color: "white" }} /> </IconButton> </DialogTitle>
+            {/* <Box display="flex" alignItems="center" justifyContent="space-between"> */}
+              {/* <Typography variant="h6">{t("addNewCustomer")}</Typography> */}
+                {/* <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel>Language</InputLabel>
                     <Select
                       value={language}
@@ -417,9 +415,17 @@ export default function Customer() {
                       <MenuItem value="ta">தமிழ்</MenuItem>
                       <MenuItem value="hi">हिंदी</MenuItem>
                     </Select>
-                </FormControl>
+                </FormControl> */}
+            {/* </Box> */}
+          {/* </DialogTitle> */}
+
+          {error.api && (
+            <Box display="flex" justifyContent="center">
+              <Typography textAlign="center" color="error" variant="body2">
+              {error.api}
+              </Typography>
             </Box>
-          </DialogTitle>
+          )}
 
           <DialogContent>
             <TextField
@@ -452,7 +458,7 @@ export default function Customer() {
               margin="dense"
               value={newCustomer.phone}
               onChange={handleNewCustomerChange}
-              error={!!newCustomer.phone}
+              error={!newCustomer.phone}
               helperText={error.phone}
             />
             <TextField
@@ -526,7 +532,15 @@ export default function Customer() {
 
         {/* Edit Customer Dialog */}
         <Dialog open={!!editCustomer} onClose={() => setEditCustomer(null)}>
-          <DialogTitle>Edit Customer</DialogTitle>
+            <DialogTitle sx={{ color: 'white', bgcolor: '#1976D2', display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>Edit Customer<IconButton onClick={() => setEditCustomer(false)} color="dark"> <CloseIcon sx={{ color: "white" }} /> </IconButton> </DialogTitle>
+
+          {error.api && (
+            <Box display="flex" justifyContent="center">
+              <Typography textAlign="center" color="error" variant="body2">
+              {error.api}
+              </Typography>
+            </Box>
+          )}
           <DialogContent>
             <TextField
               label="Name"

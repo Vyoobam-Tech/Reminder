@@ -192,6 +192,8 @@ router.get("/calendar", async (req, res) => {
       return {
         id: r._id.toString(),
         title: r.title,
+        type: r.type,
+        notes: r.notes,
         start: startDate,
       };
     });

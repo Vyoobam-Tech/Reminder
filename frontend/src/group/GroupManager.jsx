@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import API from '../api/axiosInstance';
 import {
   Container, Typography, Paper, Button, TextField, Autocomplete, Dialog,
-  DialogTitle, DialogContent, DialogActions, IconButton, Checkbox
+  DialogTitle, DialogContent, DialogActions, IconButton, Checkbox,
+  Box
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { FaUserGroup } from "react-icons/fa6";
 
 function GroupManager() {
   const [customers, setCustomers] = useState([]);
@@ -15,6 +15,7 @@ function GroupManager() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
+  const [error, setError] = useState({})
 
   useEffect(() => {
     fetchData();
@@ -30,12 +31,17 @@ function GroupManager() {
   };
 
   const handleCreateGroup = async () => {
-    if (!groupName || selectedIds.length === 0) {
-      alert('Please provide group name and select members');
-      return;
-    }
+    let newErrors ={}
 
-    await API.post('/api/groups', {
+    if(!groupName) newErrors.groupName = "Group Name is required"
+    if(selectedIds.length === 0) newErrors.selectedIds = "Customer is required"
+
+    setError(newErrors)
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    try{
+      await API.post('/api/groups', {
       name: groupName,
       members: selectedIds
     });
@@ -43,6 +49,9 @@ function GroupManager() {
     setGroupName('');
     setSelectedIds([]);
     fetchData();
+    } catch(err){
+      setError({api: err.response?.data?.message || "Failed to create group"})
+    }
   };
 
   const openEditDialog = (group) => {
@@ -66,25 +75,33 @@ function GroupManager() {
   };
 
   const handleDeleteGroup = async (groupId) => {
-    if (!window.confirm('Are you sure you want to delete this group?')) return;
     await API.delete(`/api/groups/${groupId}`);
     fetchData();
   };
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" fontWeight={600} gutterBottom>
-        <FaUserGroup /> Group Manager
+      <Typography variant="h4" gutterBottom>
+        Group Manager
       </Typography>
 
       {/* Create Group */}
       <Paper sx={{ p: 2, mt: 2 }}>
+        {error.api && (
+          <Box >
+            <Typography color='error' variant='body2'>
+              {error.api}
+            </Typography>
+          </Box>
+        )}
         <TextField
           fullWidth
           label="Group Name"
           value={groupName}
           onChange={(e) => setGroupName(e.target.value)}
           margin="normal"
+          error={!groupName}
+          helperText={error.groupName}
         />
 
         <Autocomplete
@@ -112,6 +129,8 @@ function GroupManager() {
               label="Select Customers"
               placeholder="Choose customers"
               margin="normal"
+              error={!!selectedIds}
+              helperText={error.selectedIds}
             />
           )}
         />
@@ -123,7 +142,7 @@ function GroupManager() {
 
       {/* Group List */}
       <Paper sx={{ mt: 4, p: 2 }}>
-        <Typography variant="h6" fontWeight="bold">Existing Groups</Typography>
+        <Typography variant="h6">Existing Groups</Typography>
         <ul>
           {groups.map(group => (
             <li key={group._id}>
