@@ -13,11 +13,14 @@ import {
   Stack,
   Avatar,
   Container,
+  Button,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import API from "../api/axiosInstance";
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+
 
 const SettingsPage = ({ darkMode, setDarkMode }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -138,6 +141,18 @@ const SettingsPage = ({ darkMode, setDarkMode }) => {
                   AI-Powered Follow-ups (coming soon)
                 </li>
               </ul>
+
+              <Box textAlign="center" mt={2}>
+                <a href="/demo.pdf" download>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<PictureAsPdfIcon />}
+                  >
+                    Download Demo PDF
+                  </Button>
+                </a>
+              </Box>
             </Box>
           )}
         </CardContent>

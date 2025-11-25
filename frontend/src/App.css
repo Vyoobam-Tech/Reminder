@@ -17,3 +17,8 @@ input::-webkit-credentials-auto-fill-button {
 input::-webkit-textfield-decoration-container {
   display: none !important;
 }
+
+.ag-header-bold {
+  font-weight: bold !important;
+}
+

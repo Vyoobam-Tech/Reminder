@@ -55,8 +55,8 @@ export const signin = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 3600000,
     });
 
@@ -96,7 +96,7 @@ export const googleLogin = async (req, res) => {
     res.cookie("token", tokenJWT, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 3600000,
     });
 
@@ -106,6 +106,18 @@ export const googleLogin = async (req, res) => {
     res.status(500).json({ message: "Google login failed. Please try again later." });
   }
 };
+
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  })
+
+  res.json({ message: "Logged out successfully" })
+};
+
+
 
 
 export const getProfile = async (req, res) => {

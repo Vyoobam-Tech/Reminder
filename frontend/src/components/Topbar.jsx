@@ -10,12 +10,19 @@ import {
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../assests/vyoobamnudge.png";
+import API from "../api/axiosInstance";
 
 const Topbar = ({ onMenuClick }) => {
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/";
-  };
+
+  const handleLogout = async () => {
+    try {
+      await API.post("/api/auth/logout")
+      localStorage.clear()
+      window.location.href = "/"
+    } catch (err) {
+      console.error("Logout failed", err)
+    }
+  }
 
   return (
     <AppBar

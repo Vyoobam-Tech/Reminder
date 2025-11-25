@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, useLocation } from "react-router-dom";
-import {ThemeProvider, createTheme, Box, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, Box, CssBaseline } from '@mui/material';
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
@@ -16,27 +16,28 @@ import Employee from './components/Employee';
 import SignupPage from './pages/SignupPage';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import PrivateRoute from './components/PrivateRoute';
 import Footer from './components/Footer';
 
 const App = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const hideRoutes = ["/","/signup","/forgot-password"];
-  const hideRoutesWithParams = ["/reset-password/"]
+  const hideRoutes = ["/", "/signup", "/forgot-password"];
+  const hideRoutesWithParams = ["/reset-password/"];
 
-  const showTopbar = !hideRoutes.includes(location.pathname)&&
-  !hideRoutesWithParams.some(path => location.pathname.startsWith(path))
-  const showSidebar = !hideRoutes.includes(location.pathname)&&
-  !hideRoutesWithParams.some(path => location.pathname.startsWith(path))
-  const showFooter = !hideRoutes.includes(location.pathname)&&
-  !hideRoutesWithParams.some(path=> location.pathname.startsWith(path))
-  const [darkMode, setDarkMode] = useState(false)
+  const showTopbar =
+    !hideRoutes.includes(location.pathname) &&
+    !hideRoutesWithParams.some((path) => location.pathname.startsWith(path));
+  const showSidebar = showTopbar;
+  const showFooter = showTopbar;
+
+  const [darkMode, setDarkMode] = useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   const theme = createTheme({
-  palette: {
-    mode: darkMode ? 'dark' : 'light',
-  },
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+    },
   });
 
   return (
@@ -45,9 +46,7 @@ const App = () => {
         <CssBaseline />
 
         {showTopbar && <Topbar onMenuClick={handleDrawerToggle} />}
-        {showSidebar && (
-          <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
-        )}
+        {showSidebar && <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />}
 
         <Box
           component="main"
@@ -60,20 +59,87 @@ const App = () => {
           }}
         >
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<LoginPage />} />
-            <Route path='/signup' element={<SignupPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/customer" element={<Customer />} />
-            <Route path="/employee" element={<Employee />} />
-            <Route path="/reminderReport" element={<ReminderReport />} />
-            <Route path="/reminder" element={<ReminderL />} />
-            <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode}/>} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/task" element={<Task />} />
-            <Route path="/group" element={<GroupPage />} />
+
+            {/* Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <DashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/customer"
+              element={
+                <PrivateRoute>
+                  <Customer />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/employee"
+              element={
+                <PrivateRoute>
+                  <Employee />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/reminderReport"
+              element={
+                <PrivateRoute>
+                  <ReminderReport />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/reminder"
+              element={
+                <PrivateRoute>
+                  <ReminderL />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <PrivateRoute>
+                  <SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <PrivateRoute>
+                  <CalendarPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/task"
+              element={
+                <PrivateRoute>
+                  <Task />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/group"
+              element={
+                <PrivateRoute>
+                  <GroupPage />
+                </PrivateRoute>
+              }
+            />
           </Routes>
+
           {/* {showFooter && <Footer />} */}
         </Box>
       </Box>

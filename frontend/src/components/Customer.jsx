@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-// import axios from "axios";
 import API from "../api/axiosInstance";
 import {
   Container,
@@ -27,17 +26,22 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import * as XLSX from "xlsx";
-import { MdDelete, MdEdit } from "react-icons/md";
-import { DataGrid } from "@mui/x-data-grid";
-import i18n from "../i18n";
 import { useTranslation } from "react-i18next";
 import CloseIcon from "@mui/icons-material/Close";
+import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 
 export default function Customer() {
   const {t, i18n} = useTranslation()
   const [language,setLanguage] = useState('en')
-  const [search,setSearch] = useState('')
+  const [searchName, setSearchName] = useState("");
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchPhone, setSearchPhone] = useState("");
   const [searchResults,setSearchResults] = useState([])
   const [file, setFile] = useState(null);
   const [customers, setCustomers] = useState([]);
@@ -63,6 +67,75 @@ export default function Customer() {
   const fileInputRef = useRef();
   const deliveryOptions = ["email", "sms", "whatsapp"];
 
+  const [rowData, setRowData] = useState([])
+  const [columnDefs] = useState([
+  { headerName: "Name", field: "name", headerClass: "ag-header-bold", width: 200 },
+  { headerName: "Email", field: "email",  headerClass: "ag-header-bold", width: 150 },
+  { headerName: "Phone", field: "phone",  headerClass: "ag-header-bold", width: 150 },
+
+  {
+    headerName: "Purchase Date",
+    field: "purchaseDate",
+    headerClass: "ag-header-bold",
+    width: 130,
+    valueFormatter: (params) =>
+      params.value ? params.value.split("T")[0] : "",
+  },
+
+  { headerName: "Note", field: "note",  headerClass: "ag-header-bold",  width: 200 },
+  { headerName: "Address", field: "address",  headerClass: "ag-header-bold",  width: 150 },
+
+  {
+    headerName: "DOB",
+    field: "dob",
+    headerClass: "ag-header-bold",
+    width: 120,
+    valueFormatter: (params) =>
+      params.value ? params.value.split("T")[0] : "",
+  },
+
+  {
+    headerName: "Preferred Delivery",
+    field: "preferredDelivery",
+    headerClass: "ag-header-bold",
+    width: 160,
+    valueFormatter: (params) =>
+      Array.isArray(params.value) ? params.value.join(", ") : "",
+  },
+
+  {
+    headerName: "Actions",
+    field: "actions",
+    headerClass: "ag-header-bold",
+    width: 200,
+    cellRenderer: (params) => (
+      <div style={{ display: "flex", gap: "8px" }}>
+        <IconButton
+          size="small"
+          color="primary"
+          onClick={() => handleEditOpen(params.data)}
+        >
+          <EditIcon />
+        </IconButton>
+
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => handleDelete(params.data._id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </div>
+    ),
+  },
+])
+
+  const handleReset = () => {
+    setSearchName('')
+    setSearchEmail('')
+    setSearchPhone('')
+  }
+
   useEffect(() => {
     if (newCustomerDialog) {
       setLanguage("en");        // dropdown resets
@@ -70,16 +143,12 @@ export default function Customer() {
     }
   }, [newCustomerDialog]);
 
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng)
-    setLanguage(lng)
-  }
 
-  useEffect(() => {
-      const filterResults = customers.filter((customer) => 
-        ((customer.name).toLowerCase()).startsWith(search.toLowerCase()))
-      setSearchResults(filterResults.reverse())
-      },[customers,search])
+  // useEffect(() => {
+  //     const filterResults = customers.filter((customer) => 
+  //       ((customer.name).toLowerCase()).startsWith(search.toLowerCase()))
+  //     setSearchResults(filterResults.reverse())
+  //     },[customers,search])
 
   useEffect(() => {
     fetchCustomers();
@@ -275,45 +344,50 @@ export default function Customer() {
     }
   };
 
-  const columns = [
-    {field:"id", headerName:"Sr.No",width:80},
-    {field:"name", headerName:"Name",width:150},
-    {field:"email", headerName:"Email",width:200},
-    {field:"phone", headerName:"Phone",width:140},
-    {field:"purchaseDate", headerName:"Purchase Date",width:105},
-    {field:"note", headerName:"Note",width:200},
-    {field:"address", headerName:"Address",width:150},
-    {field:"dob", headerName:"DOB",width:105},
-    {field:"preferredDelivery", headerName:"preferred Delivery",width:120},
-    {
-      field:"actions",
-      headerName:"Actions",
-      width:150,
-      renderCell:(params) => (
-        <>
-          <Button size="small" onClick={() => handleEditOpen(params.row)}>
-            <MdEdit size={25}/>
-          </Button>
-          <Button
-            size="small"
-            color="error"
-            onClick={() => handleDelete(params.row._id)}
-          >
-            <MdDelete size={25}/>
-          </Button>
-        </>
-      )
-    }
-  ]
+  // const columns = [
+  //   {field:"id", headerName:"Sr.No",width:80},
+  //   {field:"name", headerName:"Name",width:150},
+  //   {field:"email", headerName:"Email",width:200},
+  //   {field:"phone", headerName:"Phone",width:140},
+  //   {field:"purchaseDate", headerName:"Purchase Date",width:105},
+  //   {field:"note", headerName:"Note",width:200},
+  //   {field:"address", headerName:"Address",width:150},
+  //   {field:"dob", headerName:"DOB",width:105},
+  //   {field:"preferredDelivery", headerName:"preferred Delivery",width:120},
+  //   {
+  //     field:"actions",
+  //     headerName:"Actions",
+  //     width:150,
+  //     renderCell:(params) => (
+  //       <>
+  //         <Button size="small" onClick={() => handleEditOpen(params.row)}>
+  //           <MdEdit size={25}/>
+  //         </Button>
+  //         <Button
+  //           size="small"
+  //           color="error"
+  //           onClick={() => handleDelete(params.row._id)}
+  //         >
+  //           <MdDelete size={25}/>
+  //         </Button>
+  //       </>
+  //     )
+  //   }
+  // ]
 
-  const rows = customers.filter((c) => c.name.toLowerCase().startsWith(search.toLowerCase())
-  ).map((c, idx) => ({
+  const rows = customers
+  .filter((c) =>
+    c.name.toLowerCase().includes(searchName.toLowerCase()) &&
+    c.email.toLowerCase().includes(searchEmail.toLowerCase()) &&
+    c.phone.toLowerCase().includes(searchPhone.toLowerCase())
+  )
+  .map((c, idx) => ({
     id: idx + 1,
     ...c,
     purchaseDate: c.purchaseDate ? c.purchaseDate.split("T")[0] : "",
     dob: c.dob ? c.dob.split("T")[0] : "",
-  }
-  ))
+  }));
+
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -321,13 +395,50 @@ export default function Customer() {
         <Typography variant="h4" gutterBottom>
           Customer Management
         </Typography>
+        <Box mb={2}>
+          <Button variant="contained" onClick={() => setNewCustomerDialog(true)}>
+            Add New Customer
+          </Button>
+        </Box>
+        <Typography variant='h6' fontWeight="bold">Search By</Typography>
 
-        <Paper sx={{ p: 2, mb: 4 }}>
+        <Box mb={2} />
+          <Box mb={6} display="flex" gap={2}>
+            <TextField
+              label="Name"
+              value={searchName}
+              variant='outlined'
+              size='small'
+              sx={{ maxWidth:160 }}
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+            <TextField
+              label="Email"
+              value={searchEmail}
+              variant='outlined'
+              size='small'
+              sx={{ maxWidth:160 }}
+              onChange={(e) => setSearchEmail(e.target.value)}
+            />
+            <TextField
+              label="Phone"
+              value={searchPhone}
+              variant='outlined'
+              size='small'
+              sx={{ maxWidth:160 }}
+              onChange={(e) => setSearchPhone(e.target.value)}
+            />
+            <Button variant='contained' color='error' onClick={handleReset}>
+              Reset
+            </Button>
+          </Box>
+
+        {/* <Paper sx={{ p: 2, mb: 4 }}>
           <Box
             display="flex"
             gap={2}
             flexDirection={{ xs: "column", sm: "row" }}
-          >
+          > */}
             {/* <Input
               type="file"
               inputRef={fileInputRef}
@@ -339,7 +450,7 @@ export default function Customer() {
             <Button variant="contained" color="secondary" onClick={handleDownloadSample}>
               Download Sample
             </Button> */}
-            <Button
+            {/* <Button
               variant="contained"
               onClick={() => setNewCustomerDialog(true)}
             >
@@ -352,16 +463,30 @@ export default function Customer() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </Box>
-        </Paper>
+        </Paper> */}
 
-        <div>
+        {/* <div>
           <DataGrid style={{ height: 500, width: "100%"}}
             columns={columns}
             rows={rows}
             // disableRowSelectionOnClick
             // checkboxSelection
           />
-        </div>
+        </div> */}
+
+
+
+        <AgGridReact
+          rowData={rows}
+          columnDefs={columnDefs}
+          domLayout="autoHeight"
+          pagination={true}
+          paginationPageSize={10}
+          paginationPageSizeSelector={[10,25,50]}
+          onGridReady={(params) => {
+            params.api.sizeColumnsToFit()
+          }}
+        />
 
         {/* Reminder Dialog */}
         <Dialog
@@ -401,23 +526,7 @@ export default function Customer() {
           open={newCustomerDialog}
           onClose={() => setNewCustomerDialog(false)}
         >
-          {/* <DialogTitle> */}
             <DialogTitle sx={{ color: 'white', bgcolor: '#1976D2', display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>Add New Customer<IconButton onClick={() => setNewCustomerDialog(false)} color="dark"> <CloseIcon sx={{ color: "white" }} /> </IconButton> </DialogTitle>
-            {/* <Box display="flex" alignItems="center" justifyContent="space-between"> */}
-              {/* <Typography variant="h6">{t("addNewCustomer")}</Typography> */}
-                {/* <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel>Language</InputLabel>
-                    <Select
-                      value={language}
-                      onChange={(e) => changeLanguage(e.target.value)}
-                    >
-                      <MenuItem value="en">English</MenuItem>
-                      <MenuItem value="ta">தமிழ்</MenuItem>
-                      <MenuItem value="hi">हिंदी</MenuItem>
-                    </Select>
-                </FormControl> */}
-            {/* </Box> */}
-          {/* </DialogTitle> */}
 
           {error.api && (
             <Box display="flex" justifyContent="center">
@@ -429,7 +538,7 @@ export default function Customer() {
 
           <DialogContent>
             <TextField
-              label={t("name")}
+              label="name"
               name="name"
               fullWidth
               required
@@ -440,7 +549,7 @@ export default function Customer() {
               helperText={error.name}
             />
             <TextField
-              label={t("email")}
+              label="email"
               name="email"
               fullWidth
               required
@@ -451,7 +560,7 @@ export default function Customer() {
               helperText={error.email}
             />
             <TextField
-              label={t("phone")}
+              label="phone"
               name="phone"
               fullWidth
               required
@@ -462,7 +571,7 @@ export default function Customer() {
               helperText={error.phone}
             />
             <TextField
-              label={t("purchaseDate")}
+              label="purchaseDate"
               name="purchaseDate"
               type="date"
               fullWidth
@@ -472,7 +581,7 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label={t("note")}
+              label="note"
               name="note"
               fullWidth
               margin="dense"
@@ -480,7 +589,7 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label={t("address")}
+              label="address"
               name="address"
               fullWidth
               margin="dense"
@@ -489,7 +598,7 @@ export default function Customer() {
             />
 
             <TextField
-              label={t("dob")}
+              label="dob"
               name="dob"
               type="date"
               fullWidth
@@ -500,7 +609,7 @@ export default function Customer() {
             />
 
             <FormControl fullWidth margin="dense" error={Boolean(error.preferredDelivery)}>
-              <InputLabel id="preferred-label">{t("preferredDelivery")}</InputLabel>
+              <InputLabel id="preferred-label">preferredDelivery</InputLabel>
               <Select
                 labelId="preferred-label"
                 multiple
@@ -523,9 +632,9 @@ export default function Customer() {
             </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setNewCustomerDialog(false)}>{t("cancel")}</Button>
+            <Button onClick={() => setNewCustomerDialog(false)}>cancel</Button>
             <Button variant="contained" onClick={handleAddCustomer}>
-              {t("add")}
+              add
             </Button>
           </DialogActions>
         </Dialog>

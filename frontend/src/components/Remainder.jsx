@@ -9,6 +9,13 @@ import {
   } from '@mui/material';
 import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
 import CloseIcon from "@mui/icons-material/Close";
+import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
+
 
 
   const reminderTypes = [
@@ -46,6 +53,89 @@ import CloseIcon from "@mui/icons-material/Close";
     const [groupOptions, setGroupOptions] = useState([])
     const [selectedRecipients, setSelectedRecipients] = useState([])
     const [error, setError] = useState({})
+    const [search, setSearch] = useState('')
+    const [searchType, setSearchType] = useState('')
+    const [searchDate, setSearchDate] = useState('')
+    const [searchResults, setSearchResults] = useState([])
+    const [rowData, setRowData] = useState([])
+
+    const [columDefs] = useState([
+      {headerName: "Title", field: 'title',  headerClass: "ag-header-bold",  width: 120,},
+      {headerName: "Type", field: 'type',  headerClass: "ag-header-bold",  width: 120,},
+      {headerName: "Notes", field: 'notes',  headerClass: "ag-header-bold",  width: 120,},
+      {
+        headerName: "Date",
+        field: "date",
+        headerClass: "ag-header-bold",
+        valueFormatter: (params) =>
+          new Date(params.value).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+      },
+
+      {headerName: "Recurrence", field: 'recurrence', headerClass: "ag-header-bold", width: 120},
+      {
+      headerName: "Actions",
+      field: "actions",
+      headerClass: "ag-header-bold",
+      width: 120,
+      cellRenderer: (params) => (
+        <div style={{ display: "flex", gap: "8px" }}>
+          <IconButton
+            onClick={() => handleOpen(params.data)}
+            color="primary"
+            size="small"
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              handleDelete(params.data._id);
+              setConfirmOpen(true);
+            }}
+            color="error"
+            size="small"
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
+      ),
+    },
+  ])
+
+    useEffect(() => {
+      let results = reminders;
+
+      if (search.trim()) {
+        results = results.filter(r =>
+          r.title.toLowerCase().includes(search.toLowerCase())
+        )
+      }
+
+      if (searchType.trim()) {
+        results = results.filter(r =>
+          r.type.toLowerCase() === searchType.toLowerCase()
+        )
+      }
+
+
+      if (searchDate.trim()) {
+        results = results.filter(r => {
+          if (!r.date) return false  // skip null/undefined
+          const d = new Date(r.date)
+          if (isNaN(d)) return false // skip invalid date
+          return d.toISOString().slice(0, 10) === searchDate
+        })
+      }
+
+      setSearchResults(results)
+    }, [reminders, search, searchType, searchDate])
+
+    const handleReset = () => {
+      setSearch('')
+      setSearchType('')
+      setSearchDate('')
+    }
+
+
 
     useEffect(() => {
       fetchReminders();
@@ -55,7 +145,13 @@ import CloseIcon from "@mui/icons-material/Close";
 
     const fetchReminders = async () => {
       const res = await API.get('/api/reminders');
-      setReminders(res.data);
+
+      const sorted = res.data.sort(
+        (a,b) => new Date(b.date) - new Date(a.date)
+      )
+
+      setReminders(sorted);
+      setRowData(sorted)
     };
 
     const fetchEmailGroups = async () => {
@@ -74,11 +170,11 @@ import CloseIcon from "@mui/icons-material/Close";
           ...reminder,
           image: reminder.image || null,
           video: reminder.video || null,
-         date: reminder.date
-  ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16)
-  : "",
+          date: reminder.date
+          ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16)
+          : "",
 
           deliveryMethods: reminder.deliveryMethods || [],
           email: reminder.email || '',
@@ -209,9 +305,47 @@ import CloseIcon from "@mui/icons-material/Close";
     return (
       <Container sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom> Reminder Management</Typography>
-        <Box mb={2}><Button variant="contained" onClick={() => handleOpen()}>+ Add Reminder</Button></Box>
+        <Box mb={2}><Button variant="contained" onClick={() => handleOpen()}>Add Reminder</Button></Box>
 
-        <Paper>
+        <Typography variant='h6' fontWeight="bold">Search By</Typography>
+        <Box mb={2} />
+          <Box mb={6} display="flex" gap={2}>
+            <TextField
+              label="Title"
+              value={search}
+              variant='outlined'
+              size='small'
+              sx={{ maxWidth:160 }}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+
+            <FormControl sx={{ minWidth: 200 }} size="small">
+              <InputLabel>Type</InputLabel>
+              <Select label="Type" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+                {[...new Set(reminders.map(r => r.type))].map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <TextField
+              label="Date"
+              type='date'
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              variant='outlined'
+              size='small'
+              sx={{ maxWidth:200 }}
+            />
+            <Button variant='contained' color='error' onClick={handleReset}>
+              Reset
+            </Button>
+          </Box>
+
+        {/* <Paper>
           <Table>
             <TableHead>
               <TableRow>
@@ -220,12 +354,11 @@ import CloseIcon from "@mui/icons-material/Close";
                 <TableCell sx={{ fontWeight: "bold" }}>Notes</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Date</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Recurrence</TableCell>
-                {/* <TableCell>Delivery</TableCell> */}
                 <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {reminders.map((r) => (
+              {searchResults.map((r) => (
                 <TableRow key={r._id}>
                   <TableCell>{r.title}</TableCell>
                   <TableCell>{r.type}</TableCell>
@@ -242,7 +375,19 @@ import CloseIcon from "@mui/icons-material/Close";
               ))}
             </TableBody>
           </Table>
-        </Paper>
+        </Paper> */}
+
+        <AgGridReact
+          rowData={searchResults}
+          columnDefs={columDefs}
+          domLayout='autoHeight'
+          pagination={true}
+          paginationPageSize={10}
+          paginationPageSizeSelector={[10, 25, 50]}
+          onGridReady={(params) => {
+            params.api.sizeColumnsToFit()
+          }}
+        />
 
         {/* Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
@@ -477,29 +622,6 @@ import CloseIcon from "@mui/icons-material/Close";
                 )
               }}
             />
-
-
-
-            {/* Delivery Methods */}
-            {/* <FormControl fullWidth margin="dense">
-              <InputLabel id="delivery-methods-label">Preferred Choice</InputLabel>
-              <Select
-                labelId="delivery-methods-label"
-                multiple
-                name="deliveryMethods"
-                value={formData.deliveryMethods}
-                onChange={handleChange}
-                input={<OutlinedInput label="Preferred Choice" />}
-                renderValue={(selected) => selected.join(', ')}
-              >
-                {deliveryOptions.map((method) => (
-                  <MenuItem key={method} value={method}>
-                    <Checkbox checked={formData.deliveryMethods.includes(method)} />
-                    <ListItemText primary={method} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl> */}
 
 
             {formData.deliveryMethods.includes('email') && (

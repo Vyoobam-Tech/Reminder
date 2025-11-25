@@ -143,30 +143,46 @@ function GroupManager() {
       {/* Group List */}
       <Paper sx={{ mt: 4, p: 2 }}>
         <Typography variant="h6">Existing Groups</Typography>
-        <ul>
+        <Box
+          sx={{ 
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+            gap: 2,
+            mt: 2
+          }}
+        >
           {groups.map(group => (
-            <li key={group._id}>
-              <strong
+            <Paper 
+              key={group._id}
+              elevation={3}
+              sx={{
+              p: 2,
+              borderRadius: 2,
+              cursor: "pointer",
+              position: "relative",
+            }}>
+              <Typography
                 style={{ cursor: 'pointer', color: '#1976d2' }}
                 onClick={() => openEditDialog(group)}
               >
                 {group.name}
-              </strong> ({group.members.length} members)
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>Members: {group.members.length}</Typography>
               <IconButton
                 size="small"
                 color="error"
                 onClick={() => handleDeleteGroup(group._id)}
-                sx={{ ml: 1 }}
+                sx={{ position: "absolute", top: 8, right: 8 }}
               >
                 <DeleteIcon fontSize="small" />
               </IconButton>
-            </li>
+            </Paper>
           ))}
-        </ul>
+        </Box>
       </Paper>
 
       {/* Edit Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth>
+      {/* <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth>
         <DialogTitle>Edit Group</DialogTitle>
         <DialogContent>
           <TextField
@@ -209,7 +225,7 @@ function GroupManager() {
           <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleUpdateGroup}>Update</Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </Container>
   );
 }

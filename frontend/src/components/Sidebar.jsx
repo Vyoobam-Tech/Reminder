@@ -45,9 +45,9 @@ const Sidebar = ({ mobileOpen, onClose }) => {
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   const drawer = (
-    <Box sx={{ px: 1, pt: 8 }}>
+    <Box sx={{ px: 1, pt: 9 }}>
       {/* Menu Toggle Button */}
-      <Box sx={{ width: "100%", display: "flex", px: collapsed ? 1 : 2, mb: 2 }}>
+      <Box sx={{ width: "100%", display: "flex", px: collapsed ? 1 : 1, mb: 1 }}>
         <IconButton sx={{ color: "white" }} onClick={toggleSidebar}>
           <MenuIcon />
         </IconButton>
