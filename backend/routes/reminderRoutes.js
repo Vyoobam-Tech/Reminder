@@ -4,6 +4,7 @@ import scheduleReminder from "../Reminder/scheduleReminder.js";
 import upload from "../middleware/upload.js";
 import sendReminderEmail from "../utils/sendEmail.js";
 import sendWhatsApp from "../utils/sendWhatsApp.js";
+import moment from 'moment'
 
 
 const router = express.Router();
@@ -107,7 +108,8 @@ router.put(
   ]),
   async (req, res) => {
     try {
-      const { body, files } = req;
+      const body = req.body;
+      const files = req.files || {};
 
       const updateData = {
         ...body,
@@ -123,8 +125,8 @@ router.put(
           : [],
       };
 
-      // Add/replace image/video if uploaded
-      if (files.image) {
+      // safe image
+      if (files.image && files.image[0]) {
         updateData.image = {
           filename: files.image[0].filename,
           originalname: files.image[0].originalname,
@@ -133,7 +135,9 @@ router.put(
           size: files.image[0].size,
         };
       }
-      if (files.video) {
+
+      // safe video
+      if (files.video && files.video[0]) {
         updateData.video = {
           filename: files.video[0].filename,
           originalname: files.video[0].originalname,
@@ -143,23 +147,35 @@ router.put(
         };
       }
 
+      // safe date
       if (body.date) {
-        updateData.date = body.date;   // store EXACT STRING
-      }
+        const parsed = moment(body.date, [
+          "DD/MM/YYYY, hh:mm:ss a",
+          "YYYY-MM-DDTHH:mm:ss.SSSZ",
+          moment.ISO_8601
+        ]);
 
+        if (!parsed.isValid()) {
+          return res.status(400).json({ error: "Invalid date format" });
+        }
+
+        updateData.date = parsed.toDate();
+      }
 
       const reminder = await Reminder.findByIdAndUpdate(req.params.id, updateData, {
         new: true,
       });
-      scheduleReminder(reminder);
 
+      scheduleReminder(reminder);
       res.json(reminder);
+
     } catch (err) {
       console.error("❌ Reminder update error:", err.message);
       res.status(500).json({ error: err.message });
     }
   }
 );
+
 
 // ----------------------------
 // DELETE reminder
@@ -195,6 +211,12 @@ router.get("/calendar", async (req, res) => {
         type: r.type,
         notes: r.notes,
         start: startDate,
+        recurrence: r.recurrence,
+        recipients: r.recipients || [],
+        groups: r.groups || [],
+        recipientType: r.groups?.length > 0 ? "Group" : "Individual",
+        image: r.image || null,
+        video: r.video || null,
       };
     });
 

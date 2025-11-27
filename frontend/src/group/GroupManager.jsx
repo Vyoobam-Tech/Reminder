@@ -86,8 +86,8 @@ function GroupManager() {
       </Typography>
 
       {/* Create Group */}
-      <Paper sx={{ p: 2, mt: 2 }}>
-        {error.api && (
+      <Box sx={{ display: "flex", gap: 2 }}>
+         {error.api && (
           <Box >
             <Typography color='error' variant='body2'>
               {error.api}
@@ -95,7 +95,7 @@ function GroupManager() {
           </Box>
         )}
         <TextField
-          fullWidth
+          sx={{ width: '250px' }}
           label="Group Name"
           value={groupName}
           onChange={(e) => setGroupName(e.target.value)}
@@ -126,6 +126,7 @@ function GroupManager() {
           renderInput={(params) => (
             <TextField
               {...params}
+              sx={{ width: '250px' }}
               label="Select Customers"
               placeholder="Choose customers"
               margin="normal"
@@ -134,19 +135,20 @@ function GroupManager() {
             />
           )}
         />
-
-        <Button variant="contained" sx={{ mt: 2 }} onClick={handleCreateGroup}>
-          Create Group
-        </Button>
-      </Paper>
+        <Box sx={{ mt: 2 }}>
+          <Button variant="contained" onClick={handleCreateGroup}>
+            Create Group
+          </Button>
+        </Box>
+      </Box>
+       
 
       {/* Group List */}
-      <Paper sx={{ mt: 4, p: 2 }}>
-        <Typography variant="h6">Existing Groups</Typography>
+      <Typography variant="h6" sx={{ mt: 2 , mb: 2}}>Existing Groups</Typography>
         <Box
-          sx={{ 
+          sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
             gap: 2,
             mt: 2
           }}
@@ -157,6 +159,8 @@ function GroupManager() {
               elevation={3}
               sx={{
               p: 2,
+              width: 220,
+              bgcolor: '#f5f5f5',
               borderRadius: 2,
               cursor: "pointer",
               position: "relative",
@@ -179,7 +183,6 @@ function GroupManager() {
             </Paper>
           ))}
         </Box>
-      </Paper>
 
       {/* Edit Dialog */}
       {/* <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth>

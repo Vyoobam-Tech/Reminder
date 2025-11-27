@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import API from '../api/axiosInstance';
 import {
     Container, Typography, Button, Table, TableHead, TableBody, TableRow, TableCell,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, Paper, Box,
     Select, MenuItem, Checkbox, ListItemText, FormControl, InputLabel, OutlinedInput, Autocomplete,
     IconButton, InputAdornment,
-    Grid
+    Grid,
+    CircularProgress
   } from '@mui/material';
 import { MdDelete, MdEdit, MdImage, MdVideoLibrary } from "react-icons/md";
 import CloseIcon from "@mui/icons-material/Close";
@@ -58,6 +59,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     const [searchDate, setSearchDate] = useState('')
     const [searchResults, setSearchResults] = useState([])
     const [rowData, setRowData] = useState([])
+    const [loading, setLoading] = useState(false);
+
 
     const [columDefs] = useState([
       {headerName: "Title", field: 'title',  headerClass: "ag-header-bold",  width: 120,},
@@ -77,6 +80,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       field: "actions",
       headerClass: "ag-header-bold",
       width: 120,
+      filter: false,
       cellRenderer: (params) => (
         <div style={{ display: "flex", gap: "8px" }}>
           <IconButton
@@ -144,15 +148,23 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     }, []);
 
     const fetchReminders = async () => {
-      const res = await API.get('/api/reminders');
+      try {
+        setLoading(true);  // start loader
+        const res = await API.get('/api/reminders');
 
-      const sorted = res.data.sort(
-        (a,b) => new Date(b.date) - new Date(a.date)
-      )
+        const sorted = res.data.sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
 
-      setReminders(sorted);
-      setRowData(sorted)
+        setReminders(sorted);
+        setRowData(sorted);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false); // stop loader
+      }
     };
+
 
     const fetchEmailGroups = async () => {
       const res = await API.get('/api/groups');
@@ -164,34 +176,70 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       setCustomers(res.data);
     };
 
-    const handleOpen = (reminder = null) => {
-      if (reminder) {
-        setFormData({
-          ...reminder,
-          image: reminder.image || null,
-          video: reminder.video || null,
-          date: reminder.date
-          ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
-              .toISOString()
-              .slice(0, 16)
-          : "",
+    const handleOpen = async (reminder = null) => {
+  if (reminder) {
 
-          deliveryMethods: reminder.deliveryMethods || [],
-          email: reminder.email || '',
-          phone: reminder.phone || '',
-          whatsapp: reminder.whatsapp || '',
-          groupemail: reminder.groupemail || []
-        });
-        setEditId(reminder._id);
-      } else {
-        setFormData({
-          title: '', type: 'Custom', notes: '', date: '', recurrence: 'One-time',
-          deliveryMethods: [], email: '', phone: '', whatsapp: '', groupemail: []
-        });
-        setEditId(null);
-      }
-      setDialogOpen(true);
-    };
+    setFormData({
+      ...reminder,
+      image: reminder.image || null,
+      video: reminder.video || null,
+      date: reminder.date
+        ? new Date(new Date(reminder.date).getTime() - new Date().getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16)
+        : "",
+      deliveryMethods: reminder.deliveryMethods || [],
+      email: reminder.email || '',
+      phone: reminder.phone || '',
+      whatsapp: reminder.whatsapp || '',
+      groupemail: reminder.groupemail || []
+    });
+
+    setEditId(reminder._id);
+
+    // ⭐ Load recipient type
+    if (reminder.recipients?.length > 0) {
+      setRecipientType("Individual");
+      setSelectedRecipients(reminder.recipients);
+
+      // Load customers
+      const res = await API.get('/api/customers');
+      setCustomerOptions(res.data);
+
+    } else if (reminder.groups?.length > 0) {
+      setRecipientType("Group");
+      setSelectedRecipients(reminder.groups);
+
+      // Load groups
+      const res = await API.get('/api/groups');
+      setGroupOptions(res.data);
+    }
+
+  } else {
+    // NEW REMAINDER
+    setFormData({
+      title: '',
+      type: 'Custom',
+      notes: '',
+      image: null,
+      video: null,
+      date: '',
+      recurrence: 'One-time',
+      deliveryMethods: [],
+      email: '',
+      phone: '',
+      whatsapp: '',
+      groupemail: []
+    });
+
+    setRecipientType("");
+    setSelectedRecipients([]);
+    setEditId(null);
+  }
+
+  setDialogOpen(true);
+};
+
 
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -281,6 +329,12 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       setRecipientType(value)
       setSelectedRecipients([])
 
+      setFormData(prev => ({
+        ...prev,
+        recipients: [],
+        groups: []
+      }));
+
       if (value === "Individual") {
         try {
           const res = await API.get('/api/customers')
@@ -302,6 +356,14 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       setSelectedRecipients(e.target.value);
     }
 
+    const defaultColDef = useMemo(
+        () => ({
+          filter: "agTextColumnFilter",
+          floatingFilter: true,
+        }),
+        []
+      )
+
     return (
       <Container sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom> Reminder Management</Typography>
@@ -322,7 +384,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
             <FormControl sx={{ minWidth: 200 }} size="small">
               <InputLabel>Type</InputLabel>
               <Select label="Type" value={searchType} onChange={(e) => setSearchType(e.target.value)}>
-                {[...new Set(reminders.map(r => r.type))].map((type) => (
+                <MenuItem value="">All</MenuItem>
+                {reminderTypes.map((type) => (
                   <MenuItem key={type} value={type}>
                     {type}
                   </MenuItem>
@@ -345,49 +408,24 @@ ModuleRegistry.registerModules([AllCommunityModule]);
             </Button>
           </Box>
 
-        {/* <Paper>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Notes</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Date</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Recurrence</TableCell>
-                <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {searchResults.map((r) => (
-                <TableRow key={r._id}>
-                  <TableCell>{r.title}</TableCell>
-                  <TableCell>{r.type}</TableCell>
-                  <TableCell>{r.notes}</TableCell>
-                  <TableCell>
-                    {new Date(r.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-                  </TableCell>
-                  <TableCell>{r.recurrence}</TableCell>
-                  <TableCell>
-                    <Button size="large" onClick={() => handleOpen(r)}><MdEdit size={25} /></Button>
-                    <Button size='large' color="error" onClick={() => handleDelete(r._id)}><MdDelete size={25} /></Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper> */}
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+            <CircularProgress />
+          </Box>
+        ) : (
+          <div className="ag-theme-alpine" style={{ width: '100%', height: 'auto' }}>
+            <AgGridReact
+              rowData={searchResults}
+              columnDefs={columDefs}
+              defaultColDef={defaultColDef}
+              domLayout="autoHeight"
+              pagination={true}
+              paginationPageSize={10}
+              onGridReady={(params) => params.api.sizeColumnsToFit()}
+            />
+          </div>
+        )}
 
-        <AgGridReact
-          rowData={searchResults}
-          columnDefs={columDefs}
-          domLayout='autoHeight'
-          pagination={true}
-          paginationPageSize={10}
-          paginationPageSizeSelector={[10, 25, 50]}
-          onGridReady={(params) => {
-            params.api.sizeColumnsToFit()
-          }}
-        />
 
         {/* Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
@@ -402,12 +440,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                   name="title" 
                   value={formData.title} 
                   onChange={handleChange} 
-                  sx={{ width: '220px' }}
                   error={!formData.title}
                   helperText={error.title}
                 />
 
-                <TextField select fullWidth margin="dense" label="Type" name="type"  sx={{ width: '315px' }}  value={formData.type} onChange={handleChange}>
+                <TextField select fullWidth margin="dense" label="Type" name="type" value={formData.type} onChange={handleChange}>
                   {reminderTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
                 </TextField>
 
@@ -421,12 +458,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                   InputLabelProps={{ shrink: true }}
                   value={formData.date}
                   onChange={handleChange}
-                  sx={{ width: '220px' }}
                   error={!formData.date}
                   helperText={error.date}
               />
 
-              <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" sx={{ width: '315px' }} value={formData.recurrence} onChange={handleChange}>
+              <TextField select fullWidth margin="dense" label="Recurrence" name="recurrence" value={formData.recurrence} onChange={handleChange}>
                 {recurrenceOptions.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
               </TextField>
 
@@ -445,142 +481,66 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                 <MenuItem value='Individual'>Individual</MenuItem>
                 <MenuItem value='Group'>Group</MenuItem>
               </TextField>
-              
 
-            {recipientType === 'Individual' && (
-              <TextField
-                select
-                fullWidth
-                margin='dense'
-                label='Select Customer'
-                value={selectedRecipients}
-                onChange={handleSelectChange}
-                error={!!error.selectedRecipients}
-                helperText={error.selectedRecipients}
-                SelectProps={{ 
-                  multiple: true,
-                  renderValue: (selected) => 
-                    customerOptions.filter(c => selected.includes(c._id))
-                    .map(c => c.name)
-                    .join(", ")
-                }}
-              >
-                {/* {customerOptions.map((cust) => (
-                  <MenuItem key={cust._id} value={cust._id}>
-                    <Checkbox checked={selectedRecipients.includes(cust._id)}/>
-                    <ListItemText>{cust.name}</ListItemText>
-                  </MenuItem>
-                ))} */}
-                <Autocomplete
-                multiple
-                options={customerOptions}
-                getOptionLabel={(option) => option.name}
-                value={customerOptions.filter((c) => selectedRecipients.includes(c._id))}
-                onChange={(e, value) => setSelectedRecipients(value.map((v) => v._id))}
-                disableCloseOnSelect
-                renderOption={(props, option, { selected }) => (
-                  <li {...props}>
-                    <Checkbox
-                      checked={selected}
-                      style={{ marginRight: 8 }}
-                    />
-                    {option.name}
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select Customer"
-                    placeholder="Type to search..."
-                    margin="dense"
-                    fullWidth
-                  />
-                )}
-                renderTags={(selected, getTagProps) =>
-                  selected.map((option) => (
-                    <span
-                      key={option._id}
-                      style={{
-                        padding: "2px 6px",
-                        margin: 2,
-                        background: "#e0e0e0",
-                        borderRadius: 4,
-                        display: "inline-flex"
-                      }}
-                    >
-                      {option.name}
-                    </span>
-                  ))
-                }
-              />
-              </TextField>
-            )}
-
-            {recipientType === 'Group' && (
-              <TextField
-                select
-                fullWidth
-                margin='dense'
-                label='Select Group'
-                value={selectedRecipients}
-                onChange={handleSelectChange}
-                error={!!error.selectedRecipients}
-                helperText={error.selectedRecipients}
-                SelectProps={{ 
-                  multiple: true,
-                  renderValue: (selected) => 
-                    groupOptions.filter(g => selected.includes(g._id))
-                    .map(g => g.name)
-                    .join(", ")
-                }}
-              >
-                {/* {groupOptions.map((gro) => (
-                  <MenuItem key={gro._id} value={gro._id}>
-                    <Checkbox checked={selectedRecipients.includes(gro._id)}/>
-                    <ListItemText>{gro.name}</ListItemText>
-                  </MenuItem>
-                ))} */}
+            <Box sx={{ width: "100%" }}>
+              {recipientType === "Individual" && (
                 <Autocomplete
                   multiple
-                  options={groupOptions}
+                  options={customerOptions}
                   getOptionLabel={(option) => option.name}
-                  value={(groupOptions.filter((g) => selectedRecipients.includes(g._id)))}
+                  value={customerOptions.filter((c) => selectedRecipients.includes(c._id))}
                   onChange={(e, value) => setSelectedRecipients(value.map(v => v._id))}
                   disableCloseOnSelect
-                  renderOption={(props, option, {selected}) => (
+                  renderOption={(props, option, { selected }) => (
                     <li {...props}>
-                      <Checkbox checked={selected} style={{ marginRight:8 }}/>
+                      <Checkbox checked={selected} style={{ marginRight: 8 }} />
                       {option.name}
                     </li>
                   )}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label='Select Group'
-                      placeholder='Type to Search ...'
-                      margin='dense'
+                      label="Select Customers"
+                      margin="dense"
                       fullWidth
+                      error={!!error.selectedRecipients}
+                      helperText={error.selectedRecipients}
                     />
                   )}
-                  renderTags={(selected, getTagProps) =>
-                  selected.map((option) => (
-                    <span
-                      key={option._id}
-                      style={{
-                        padding: "2px 6px",
-                        margin: 2,
-                        background: "#e0e0e0",
-                        borderRadius: 4,
-                        display: "inline-flex"
-                      }}
-                    >
-                      {option.name}
-                    </span>
-                  ))
-                }
                 />
-              </TextField>
-            )}
+              )}
+            </Box>
+
+
+            <Box sx={{ width: "100%"}}>
+              {recipientType === 'Group' && (
+                <Autocomplete
+                  multiple
+                  options={groupOptions}
+                  getOptionLabel={(option) => option.name}
+                  value={groupOptions.filter((g) => selectedRecipients.includes(g._id))}
+                  onChange={(e, value) => setSelectedRecipients(value.map(v => v._id))}
+                  disableCloseOnSelect
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <Checkbox checked={selected} style={{ marginRight: 8 }} />
+                      {option.name}
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Groups"
+                      margin="dense"
+                      fullWidth
+                      error={!!error.selectedRecipients}
+                      helperText={error.selectedRecipients}
+                    />
+                  )}
+                />
+              )}
+            </Box>
+
 
             <TextField
               fullWidth
@@ -606,6 +566,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                           setFormData(prev => ({ ...prev, image: e.target.files[0] || null }))
                         }
                       />
+                      {formData.image && (
+                        <Typography sx={{ mt: 1, fontSize: "14px", color: "green" }}>
+                          {formData.image.name || formData.image.originalname || formData.image.filename}
+                        </Typography>
+                      )}
                     </IconButton>
                     <IconButton color="secondary" component="label">
                       <MdVideoLibrary size={22} />
@@ -617,6 +582,11 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                           setFormData(prev => ({ ...prev, video: e.target.files[0] || null }))
                         }
                       />
+                      {formData.video && (
+                        <Typography sx={{ mt: 1, fontSize: "14px", color: "purple" }}>
+                          {formData.video.name || formData.video.originalname || formData.video.filename}
+                        </Typography>
+                      )}
                     </IconButton>
                   </InputAdornment>
                 )
@@ -624,7 +594,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
             />
 
 
-            {formData.deliveryMethods.includes('email') && (
+            {/* {formData.deliveryMethods.includes('email') && (
               <Autocomplete
                 options={customers.map(c => c.email).filter(Boolean)}
                 value={formData.email}
@@ -665,7 +635,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                   ))}
                 </Select>
               </FormControl>
-            )}
+            )} */}
           </Grid>
           </DialogContent>
           <DialogActions>

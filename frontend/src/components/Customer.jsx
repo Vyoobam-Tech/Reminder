@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import API from "../api/axiosInstance";
 import {
   Container,
@@ -21,6 +21,7 @@ import {
   OutlinedInput,
   FormHelperText,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -51,6 +52,7 @@ export default function Customer() {
     id: null,
     value: null,
   });
+  const [loading, setLoading] = useState(false)
   const [newCustomerDialog, setNewCustomerDialog] = useState(false);
   const [error,setError] = useState({})
   const [newCustomer, setNewCustomer] = useState({
@@ -71,7 +73,7 @@ export default function Customer() {
   const [columnDefs] = useState([
   { headerName: "Name", field: "name", headerClass: "ag-header-bold", width: 200 },
   { headerName: "Email", field: "email",  headerClass: "ag-header-bold", width: 150 },
-  { headerName: "Phone", field: "phone",  headerClass: "ag-header-bold", width: 150 },
+  { headerName: "Mobile", field: "phone",  headerClass: "ag-header-bold", width: 150 },
 
   {
     headerName: "Purchase Date",
@@ -108,6 +110,7 @@ export default function Customer() {
     field: "actions",
     headerClass: "ag-header-bold",
     width: 200,
+    filter: false,
     cellRenderer: (params) => (
       <div style={{ display: "flex", gap: "8px" }}>
         <IconButton
@@ -156,10 +159,13 @@ export default function Customer() {
 
   const fetchCustomers = async () => {
     try {
+      setLoading(true)
       const res = await API.get("/api/customers");
       setCustomers(res.data);
     } catch {
       alert("Failed to fetch customers");
+    }  finally {
+      setLoading(false); 
     }
   };
   const handleUpload = async () => {
@@ -344,37 +350,6 @@ export default function Customer() {
     }
   };
 
-  // const columns = [
-  //   {field:"id", headerName:"Sr.No",width:80},
-  //   {field:"name", headerName:"Name",width:150},
-  //   {field:"email", headerName:"Email",width:200},
-  //   {field:"phone", headerName:"Phone",width:140},
-  //   {field:"purchaseDate", headerName:"Purchase Date",width:105},
-  //   {field:"note", headerName:"Note",width:200},
-  //   {field:"address", headerName:"Address",width:150},
-  //   {field:"dob", headerName:"DOB",width:105},
-  //   {field:"preferredDelivery", headerName:"preferred Delivery",width:120},
-  //   {
-  //     field:"actions",
-  //     headerName:"Actions",
-  //     width:150,
-  //     renderCell:(params) => (
-  //       <>
-  //         <Button size="small" onClick={() => handleEditOpen(params.row)}>
-  //           <MdEdit size={25}/>
-  //         </Button>
-  //         <Button
-  //           size="small"
-  //           color="error"
-  //           onClick={() => handleDelete(params.row._id)}
-  //         >
-  //           <MdDelete size={25}/>
-  //         </Button>
-  //       </>
-  //     )
-  //   }
-  // ]
-
   const rows = customers
   .filter((c) =>
     c.name.toLowerCase().includes(searchName.toLowerCase()) &&
@@ -388,6 +363,13 @@ export default function Customer() {
     dob: c.dob ? c.dob.split("T")[0] : "",
   }));
 
+  const defaultColDef = useMemo(
+    () => ({
+      filter: "agTextColumnFilter",
+      floatingFilter: true,
+    }),
+    []
+  )
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -421,7 +403,7 @@ export default function Customer() {
               onChange={(e) => setSearchEmail(e.target.value)}
             />
             <TextField
-              label="Phone"
+              label="Mobile"
               value={searchPhone}
               variant='outlined'
               size='small'
@@ -433,52 +415,16 @@ export default function Customer() {
             </Button>
           </Box>
 
-        {/* <Paper sx={{ p: 2, mb: 4 }}>
-          <Box
-            display="flex"
-            gap={2}
-            flexDirection={{ xs: "column", sm: "row" }}
-          > */}
-            {/* <Input
-              type="file"
-              inputRef={fileInputRef}
-              onChange={(e) => setFile(e.target.files[0])}
-            />
-            <Button variant="contained" onClick={handleUpload}>
-              Upload Excel
-            </Button>
-            <Button variant="contained" color="secondary" onClick={handleDownloadSample}>
-              Download Sample
-            </Button> */}
-            {/* <Button
-              variant="contained"
-              onClick={() => setNewCustomerDialog(true)}
-            >
-              Add Customer
-            </Button>
-            <TextField 
-              type='text'
-              name='search'
-              placeholder='Search'
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </Box>
-        </Paper> */}
-
-        {/* <div>
-          <DataGrid style={{ height: 500, width: "100%"}}
-            columns={columns}
-            rows={rows}
-            // disableRowSelectionOnClick
-            // checkboxSelection
-          />
-        </div> */}
-
-
-
+      {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+              <CircularProgress />
+            </Box>
+      ) : (
+      <div className="ag-theme-alpine" style={{ width: '100%', height: 'auto' }}>
         <AgGridReact
           rowData={rows}
           columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
           domLayout="autoHeight"
           pagination={true}
           paginationPageSize={10}
@@ -487,6 +433,8 @@ export default function Customer() {
             params.api.sizeColumnsToFit()
           }}
         />
+        </div>
+        )}
 
         {/* Reminder Dialog */}
         <Dialog
@@ -538,7 +486,7 @@ export default function Customer() {
 
           <DialogContent>
             <TextField
-              label="name"
+              label="Name"
               name="name"
               fullWidth
               required
@@ -549,7 +497,7 @@ export default function Customer() {
               helperText={error.name}
             />
             <TextField
-              label="email"
+              label="Email"
               name="email"
               fullWidth
               required
@@ -560,7 +508,7 @@ export default function Customer() {
               helperText={error.email}
             />
             <TextField
-              label="phone"
+              label="Mobile"
               name="phone"
               fullWidth
               required
@@ -571,7 +519,7 @@ export default function Customer() {
               helperText={error.phone}
             />
             <TextField
-              label="purchaseDate"
+              label="Purchase Date"
               name="purchaseDate"
               type="date"
               fullWidth
@@ -581,7 +529,7 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label="note"
+              label="Note"
               name="note"
               fullWidth
               margin="dense"
@@ -589,7 +537,7 @@ export default function Customer() {
               onChange={handleNewCustomerChange}
             />
             <TextField
-              label="address"
+              label="Address"
               name="address"
               fullWidth
               margin="dense"
@@ -598,7 +546,7 @@ export default function Customer() {
             />
 
             <TextField
-              label="dob"
+              label="Date of Birth"
               name="dob"
               type="date"
               fullWidth
@@ -609,7 +557,7 @@ export default function Customer() {
             />
 
             <FormControl fullWidth margin="dense" error={Boolean(error.preferredDelivery)}>
-              <InputLabel id="preferred-label">preferredDelivery</InputLabel>
+              <InputLabel id="preferred-label">Preferred Delivery</InputLabel>
               <Select
                 labelId="preferred-label"
                 multiple
@@ -668,7 +616,7 @@ export default function Customer() {
               onChange={handleEditChange}
             />
             <TextField
-              label="Phone"
+              label="Mobile"
               name="phone"
               fullWidth
               margin="dense"

@@ -9,6 +9,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  IconButton,
 } from '@mui/material';
 import {
   EventAvailable,
@@ -169,21 +170,45 @@ const DashboardPage = () => {
         <Typography variant="h4" gutterBottom>
           Recent General Reminders
         </Typography>
-        <Paper elevation={3} sx={{ p: 2}}>
-          <List>
-            {recentReminders.map((r, i) => (
-              <React.Fragment key={r._id}>
-                <ListItem>
-                  <ListItemText
-                    primary={`${r.title} - ${r.type || 'N/A'} - ${r.notes || 'No note'}`}
-                    secondary={new Date(r.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-                  />
-                </ListItem>
-                {i !== recentReminders.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
-        </Paper>
+        <Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+    gap: 2,
+    mt: 2
+  }}
+>
+  {recentReminders.map((r) => (
+    <Paper
+      key={r._id}
+      elevation={3}
+      sx={{
+        p: 2,
+        width: 220,
+        bgcolor: '#f5f5f5',
+        borderRadius: 2,
+        position: "relative",
+      }}
+    >
+      {/* Title */}
+      <Typography
+        sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+        {r.title || 'No Title'}
+      </Typography>
+
+      {/* Type */}
+      <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+        Type: {r.type || "N/A"}
+      </Typography>
+
+      <Typography variant="caption" sx={{ mt: 1, display: "block", color: "gray" }}>
+        {new Date(r.date).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+      </Typography>
+
+    </Paper>
+  ))}
+</Box>
+
       </Box>
 
       {/* Recent Customer Reminders */}
