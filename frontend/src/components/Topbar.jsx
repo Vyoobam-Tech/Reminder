@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -11,8 +11,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import logo from "../assests/vyoobamnudge.png";
 import API from "../api/axiosInstance";
+import ConfirmDialog from "./ConfirmDialog";
 
 const Topbar = ({ onMenuClick }) => {
+
+  const [open, setOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -47,24 +50,24 @@ const Topbar = ({ onMenuClick }) => {
           >
             <MenuIcon />
           </IconButton>
-          <img src={logo}  style={{ height: 75, width: "auto", marginLeft: 28 }}/>
-          {/* <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 600,
-              fontSize: { xs: 18, sm: 22 },
-            }}
-          >
-            Vyoobam Reminder
-          </Typography> */}
+          <img src={logo}  style={{ height: 75, width: "auto" }}/>
         </Box>
 
         {/* Right: Logout Icon (always shown) */}
         <Tooltip title="Logout">
-          <IconButton color="inherit" onClick={handleLogout}>
+          <IconButton color="inherit" onClick={() => setOpen(true)}>
             <LogoutIcon />
           </IconButton>
         </Tooltip>
+
+        <ConfirmDialog
+          open={open}
+          title="Logout"
+          message="Are you sure you want to logout?"
+          confirmText="Logout"
+          onConfirm={handleLogout}
+          onCancel={() => setOpen(false)}
+        />
       </Toolbar>
     </AppBar>
   );

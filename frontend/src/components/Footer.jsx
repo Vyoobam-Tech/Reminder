@@ -4,16 +4,15 @@ import React from 'react'
 const Footer = () => {
   return (
     <AppBar
-        position='fixed'
+        position='static'
         sx={{
             top: "auto",
             bottom: 0,
-            height: "45px",
             background: "#1976d2"
         }}
     >
         <Toolbar sx={{ justifyContent: "center"}}>
-            <Typography variant='body2' pb="12px">
+            <Typography variant='body2'>
                 &copy; {new Date().getFullYear()} Vyoobam Tech. All rights reserved. | Empowering Digital Solutions
             </Typography>
         </Toolbar>

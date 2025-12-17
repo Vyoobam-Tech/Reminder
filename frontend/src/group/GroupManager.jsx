@@ -6,6 +6,7 @@ import {
   DialogTitle, DialogContent, DialogActions, IconButton, Checkbox,
   Box
 } from '@mui/material';
+import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 function GroupManager() {
@@ -165,10 +166,7 @@ function GroupManager() {
               cursor: "pointer",
               position: "relative",
             }}>
-              <Typography
-                style={{ cursor: 'pointer', color: '#1976d2' }}
-                onClick={() => openEditDialog(group)}
-              >
+              <Typography>
                 {group.name}
               </Typography>
               <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>Members: {group.members.length}</Typography>
@@ -179,6 +177,13 @@ function GroupManager() {
                 sx={{ position: "absolute", top: 8, right: 8 }}
               >
                 <DeleteIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                color='primary'
+                onClick={() => openEditDialog(group)}
+                sx={{ position: "absolute", top: 6, right: 26 }}
+              >
+                <EditIcon fontSize='small'/>
               </IconButton>
             </Paper>
           ))}

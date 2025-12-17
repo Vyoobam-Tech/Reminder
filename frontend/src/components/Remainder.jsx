@@ -63,6 +63,34 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 
     const [columDefs] = useState([
+      {
+        headerName: "Actions",
+        field: "actions",
+        headerClass: "ag-header-bold",
+        width: 120,
+        filter: false,
+        cellRenderer: (params) => (
+          <div style={{ display: "flex", gap: "8px" }}>
+            <IconButton
+              onClick={() => handleOpen(params.data)}
+              color="primary"
+              size="small"
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                handleDelete(params.data._id);
+                setConfirmOpen(true);
+              }}
+              color="error"
+              size="small"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </div>
+        ),
+      },
       {headerName: "Title", field: 'title',  headerClass: "ag-header-bold",  width: 120,},
       {headerName: "Type", field: 'type',  headerClass: "ag-header-bold",  width: 120,},
       {headerName: "Notes", field: 'notes',  headerClass: "ag-header-bold",  width: 120,},
@@ -75,34 +103,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       },
 
       {headerName: "Recurrence", field: 'recurrence', headerClass: "ag-header-bold", width: 120},
-      {
-      headerName: "Actions",
-      field: "actions",
-      headerClass: "ag-header-bold",
-      width: 120,
-      filter: false,
-      cellRenderer: (params) => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <IconButton
-            onClick={() => handleOpen(params.data)}
-            color="primary"
-            size="small"
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              handleDelete(params.data._id);
-              setConfirmOpen(true);
-            }}
-            color="error"
-            size="small"
-          >
-            <DeleteIcon />
-          </IconButton>
-        </div>
-      ),
-    },
   ])
 
     useEffect(() => {
@@ -138,8 +138,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       setSearchType('')
       setSearchDate('')
     }
-
-
 
     useEffect(() => {
       fetchReminders();
@@ -421,6 +419,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
               domLayout="autoHeight"
               pagination={true}
               paginationPageSize={10}
+              paginationPageSizeSelector={[10, 25, 50]}
               onGridReady={(params) => params.api.sizeColumnsToFit()}
             />
           </div>
@@ -592,50 +591,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
                 )
               }}
             />
-
-
-            {/* {formData.deliveryMethods.includes('email') && (
-              <Autocomplete
-                options={customers.map(c => c.email).filter(Boolean)}
-                value={formData.email}
-                onChange={(e, value) => setFormData(prev => ({ ...prev, email: value || '' }))}
-                renderInput={(params) => <TextField {...params} label="Email Address" margin="dense" fullWidth />}
-                freeSolo
-              />
-            )}
-            {formData.deliveryMethods.includes('phone') && (
-              <Autocomplete
-                options={customers.map(c => c.phone).filter(Boolean)}
-                value={formData.phone}
-                onChange={(e, value) => setFormData(prev => ({ ...prev, phone: value || '' }))}
-                renderInput={(params) => <TextField {...params} label="Phone Number" margin="dense" fullWidth />}
-                freeSolo
-              />
-            )}
-            {formData.deliveryMethods.includes('whatsapp') && (
-              <TextField fullWidth margin="dense" label="WhatsApp Number" name="whatsapp" value={formData.whatsapp} onChange={handleChange} />
-            )}
-            {formData.deliveryMethods.includes('emailgroup') && (
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="email-groups-label">Email Groups</InputLabel>
-                <Select
-                  labelId="email-groups-label"
-                  multiple
-                  name="groupemail"
-                  value={formData.groupemail}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Email Groups" />}
-                  renderValue={(selected) => selected.join(', ')}
-                >
-                  {emailGroups.map((group) => (
-                    <MenuItem key={group._id} value={group.name}>
-                      <Checkbox checked={formData.groupemail.includes(group.name)} />
-                      <ListItemText primary={group.name} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )} */}
           </Grid>
           </DialogContent>
           <DialogActions>

@@ -19,21 +19,21 @@ import path from 'path'
 dotenv.config();
 const app = express();
 
-// const CLIENT_URL= process.env.CLIENT_URL || 'http://localhost:5173'
+const CLIENT_URL= process.env.CLIENT_URL || 'http://localhost:5173'
 
-// app.use(cors({ origin: [CLIENT_URL],
-//       credentials: true,
-//       methods: ['GET', "POST", "PUT", "DELETE"]}));
+app.use(cors({ origin: [CLIENT_URL],
+      credentials: true,
+      methods: ['GET', "POST", "PUT", "DELETE"]}));
 
-app.use(
-  cors({
-    origin: [
-      "https://reminder.vyoobam.com",
-    ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "https://reminder.vyoobam.com",
+//     ],
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//   })
+// );
 
 app.use(express.json());
 app.use(cookieParser());

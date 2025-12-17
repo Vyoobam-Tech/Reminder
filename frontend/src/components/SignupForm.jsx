@@ -52,8 +52,8 @@ const SignupForm = () => {
       valid = false;
     }
 
-    if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Phone number must be 10 digits.";
+    if (!/^[6-9]\d{9}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number Invalid.";
       valid = false;
     }
 

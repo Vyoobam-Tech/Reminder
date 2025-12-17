@@ -56,6 +56,10 @@ const App = () => {
             mt: { xs: '64px', sm: '64px' },
             ml: showSidebar ? { sm: '190px' } : 0,
             width: '100%',
+
+            minHeight: "calc(100vh - 64px)", 
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Routes>
@@ -139,10 +143,10 @@ const App = () => {
               }
             />
           </Routes>
-
-          {/* {showFooter && <Footer />} */}
         </Box>
       </Box>
+
+      {showFooter && <Footer />}
     </ThemeProvider>
   );
 };

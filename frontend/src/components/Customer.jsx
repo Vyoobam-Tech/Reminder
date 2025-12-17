@@ -64,13 +64,38 @@ export default function Customer() {
     address: "", 
     dob: "", 
     preferredDelivery: [],
-    
   });
   const fileInputRef = useRef();
   const deliveryOptions = ["email", "sms", "whatsapp"];
 
   const [rowData, setRowData] = useState([])
   const [columnDefs] = useState([
+    {
+    headerName: "Actions",
+    field: "actions",
+    headerClass: "ag-header-bold",
+    width: 200,
+    filter: false,
+    cellRenderer: (params) => (
+      <div style={{ display: "flex", gap: "8px" }}>
+        <IconButton
+          size="small"
+          color="primary"
+          onClick={() => handleEditOpen(params.data)}
+        >
+          <EditIcon />
+        </IconButton>
+
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => handleDelete(params.data._id)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </div>
+    ),
+  },
   { headerName: "Name", field: "name", headerClass: "ag-header-bold", width: 200 },
   { headerName: "Email", field: "email",  headerClass: "ag-header-bold", width: 150 },
   { headerName: "Mobile", field: "phone",  headerClass: "ag-header-bold", width: 150 },
@@ -104,33 +129,6 @@ export default function Customer() {
     valueFormatter: (params) =>
       Array.isArray(params.value) ? params.value.join(", ") : "",
   },
-
-  {
-    headerName: "Actions",
-    field: "actions",
-    headerClass: "ag-header-bold",
-    width: 200,
-    filter: false,
-    cellRenderer: (params) => (
-      <div style={{ display: "flex", gap: "8px" }}>
-        <IconButton
-          size="small"
-          color="primary"
-          onClick={() => handleEditOpen(params.data)}
-        >
-          <EditIcon />
-        </IconButton>
-
-        <IconButton
-          size="small"
-          color="error"
-          onClick={() => handleDelete(params.data._id)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </div>
-    ),
-  },
 ])
 
   const handleReset = () => {
@@ -146,12 +144,6 @@ export default function Customer() {
     }
   }, [newCustomerDialog]);
 
-
-  // useEffect(() => {
-  //     const filterResults = customers.filter((customer) => 
-  //       ((customer.name).toLowerCase()).startsWith(search.toLowerCase()))
-  //     setSearchResults(filterResults.reverse())
-  //     },[customers,search])
 
   useEffect(() => {
     fetchCustomers();

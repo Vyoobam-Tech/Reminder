@@ -8,6 +8,7 @@ import {
   ListItemText,
   IconButton,
   useMediaQuery,
+  Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -45,11 +46,16 @@ const Sidebar = ({ mobileOpen, onClose }) => {
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   const drawer = (
-    <Box sx={{ px: 1, pt: 9 }}>
+    <Box sx={{ px: 1, pt: 12 }}>
       {/* Menu Toggle Button */}
       <Box sx={{ width: "100%", display: "flex", px: collapsed ? 1 : 1, mb: 1 }}>
         <IconButton sx={{ color: "white" }} onClick={toggleSidebar}>
           <MenuIcon />
+          {!collapsed && (
+          <Typography sx={{ pl: 2 }}>
+            Menu
+          </Typography>
+        )}
         </IconButton>
       </Box>
 
@@ -96,7 +102,7 @@ const Sidebar = ({ mobileOpen, onClose }) => {
                 <ListItemText
                   primary={item.label}
                   primaryTypographyProps={{
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: 500,
                     color: "white",
                   }}
