@@ -74,7 +74,7 @@ const Topbar = ({ onMenuClick }) => {
           justifyContent: "space-between",
         }}>
           <Typography sx={{ pr:4 }}>
-            {user ? user.username : ""}
+            Welcome, {user ? user.username : ""}
           </Typography>
 
         {/* Right: Logout Icon (always shown) */}
