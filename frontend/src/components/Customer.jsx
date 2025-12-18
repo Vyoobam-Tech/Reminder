@@ -33,6 +33,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ConfirmDialog from "./ConfirmDialog";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -55,6 +56,8 @@ export default function Customer() {
   const [loading, setLoading] = useState(false)
   const [newCustomerDialog, setNewCustomerDialog] = useState(false);
   const [error,setError] = useState({})
+  const [openDelete, setOpenDelete] = useState(false)
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null)
   const [newCustomer, setNewCustomer] = useState({
     name: "",
     email: "",
@@ -89,8 +92,11 @@ export default function Customer() {
         <IconButton
           size="small"
           color="error"
-          onClick={() => handleDelete(params.data._id)}
-        >
+          onClick={() => {
+            setSelectedCustomerId(params.data._id);
+            setOpenDelete(true)
+          }}
+          >
           <DeleteIcon />
         </IconButton>
       </div>
@@ -427,6 +433,18 @@ export default function Customer() {
         />
         </div>
         )}
+
+        <ConfirmDialog
+          open={openDelete}
+          title="Delete"
+          message="Are you sure you want to Delete this Customer?"
+          confirmText="Delete"
+          onConfirm={() => {
+            handleDelete(selectedCustomerId);
+            setOpenDelete(false)
+          }}
+          onCancel={() => setOpenDelete(false)}
+        />
 
         {/* Reminder Dialog */}
         <Dialog

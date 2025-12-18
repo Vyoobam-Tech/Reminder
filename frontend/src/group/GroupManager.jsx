@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 function GroupManager() {
   const [customers, setCustomers] = useState([]);
@@ -17,6 +18,8 @@ function GroupManager() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
   const [error, setError] = useState({})
+  const [openDelete, setOpenDelete] = useState(false)
+  const [selectedGroupId, setSelectedGroupId] = useState(null)
 
   useEffect(() => {
     fetchData();
@@ -142,7 +145,18 @@ function GroupManager() {
           </Button>
         </Box>
       </Box>
-       
+
+        <ConfirmDialog
+          open={openDelete}
+          title="Delete"
+          message="Are you sure you want to Delete this Group?"
+          confirmText="Delete"
+          onConfirm={() => {
+            handleDeleteGroup(selectedGroupId);
+            setOpenDelete(false)
+          }}
+          onCancel={() => setOpenDelete(false)}
+        />
 
       {/* Group List */}
       <Typography variant="h6" sx={{ mt: 2 , mb: 2}}>Existing Groups</Typography>
@@ -173,7 +187,11 @@ function GroupManager() {
               <IconButton
                 size="small"
                 color="error"
-                onClick={() => handleDeleteGroup(group._id)}
+                onClick={() => {
+                  setSelectedGroupId(group._id);
+                  setOpenDelete(true)
+                }
+                }
                 sx={{ position: "absolute", top: 8, right: 8 }}
               >
                 <DeleteIcon fontSize="small" />
@@ -188,52 +206,6 @@ function GroupManager() {
             </Paper>
           ))}
         </Box>
-
-      {/* Edit Dialog */}
-      {/* <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} fullWidth>
-        <DialogTitle>Edit Group</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Group Name"
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
-            margin="normal"
-          />
-          <Autocomplete
-            multiple
-            disableCloseOnSelect
-            options={customers}
-            getOptionLabel={(option) => option.name}
-            value={customers.filter(c => selectedIds.includes(c._id))}
-            onChange={(event, newValue) => {
-              const ids = newValue.map(c => c._id);
-              setSelectedIds(ids);
-            }}
-            renderOption={(props, option, { selected }) => (
-              <li {...props}>
-                <Checkbox
-                  style={{ marginRight: 8 }}
-                  checked={selected}
-                />
-                {option.name}
-              </li>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select Customers"
-                placeholder="Choose customers"
-                margin="normal"
-              />
-            )}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleUpdateGroup}>Update</Button>
-        </DialogActions>
-      </Dialog> */}
     </Container>
   );
 }

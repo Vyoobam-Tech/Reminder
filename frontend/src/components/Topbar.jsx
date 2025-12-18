@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -16,6 +16,21 @@ import ConfirmDialog from "./ConfirmDialog";
 const Topbar = ({ onMenuClick }) => {
 
   const [open, setOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  
+  useEffect(() => {
+      const fetchProfile = async () => {
+        try {
+          const res = await API.get("/api/auth/profile", {
+            withCredentials: true,
+          });
+          setUser(res.data.user)
+        } catch (error) {
+          console.error("Failed to fetch profile:", error);
+        }
+      };
+      fetchProfile()
+    }, [])
 
   const handleLogout = async () => {
     try {
@@ -53,12 +68,23 @@ const Topbar = ({ onMenuClick }) => {
           <img src={logo}  style={{ height: 75, width: "auto" }}/>
         </Box>
 
+        <Box sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}>
+          <Typography sx={{ pr:4 }}>
+            {user ? user.username : ""}
+          </Typography>
+
         {/* Right: Logout Icon (always shown) */}
         <Tooltip title="Logout">
           <IconButton color="inherit" onClick={() => setOpen(true)}>
             <LogoutIcon />
           </IconButton>
         </Tooltip>
+
+        </Box>
 
         <ConfirmDialog
           open={open}

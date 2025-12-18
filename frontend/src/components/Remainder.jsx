@@ -14,6 +14,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ConfirmDialog from './ConfirmDialog';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -60,6 +61,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     const [searchResults, setSearchResults] = useState([])
     const [rowData, setRowData] = useState([])
     const [loading, setLoading] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false)
+    const [selectedReminderId, setSelectedReminderId] = useState(null)
+
 
 
     const [columDefs] = useState([
@@ -80,8 +84,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
             </IconButton>
             <IconButton
               onClick={() => {
-                handleDelete(params.data._id);
-                setConfirmOpen(true);
+                setSelectedReminderId(params.data._id);
+                setOpenDelete(true);
               }}
               color="error"
               size="small"
@@ -425,13 +429,23 @@ ModuleRegistry.registerModules([AllCommunityModule]);
           </div>
         )}
 
+        <ConfirmDialog
+          open={openDelete}
+          title="Delete"
+          message="Are you sure you want to Delete this Reminder?"
+          confirmText="Delete"
+          onConfirm={() => {
+            handleDelete(selectedReminderId);
+            setOpenDelete(false)
+          }}
+          onCancel={() => setOpenDelete(false)}
+        />
 
         {/* Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
           <DialogTitle sx={{ color: 'white', bgcolor: '#1976D2', display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>{editId ? 'Edit' : 'Create'} Reminder<IconButton onClick={() => setDialogOpen(false)} color="dark"> <CloseIcon sx={{ color: "white" }} /> </IconButton> </DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
-            
                 <TextField 
                   fullWidth 
                   margin="dense" 
